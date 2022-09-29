@@ -736,18 +736,7 @@ impl Context {
         image: impl Into<ImageData>,
         filter: TextureFilter,
     ) -> TextureHandle {
-        let name = name.into();
-        let image = image.into();
-        let max_texture_side = tex_manager.read().max_texture_side();
-        crate::egui_assert!(
-            image.width() <= max_texture_side && image.height() <= max_texture_side,
-            "Texture {:?} has size {}x{}, but the maximum texture side is {}",
-            name,
-            image.width(),
-            image.height(),
-            max_texture_side
-        );
-        let tex_id = tex_manager.write().alloc(name, image, filter);
+        let tex_id = tex_manager.write().alloc(name.into(), image.into(), filter);
         TextureHandle::new(tex_manager, tex_id)
     }
 

@@ -54,6 +54,15 @@ impl TextureManager {
     ///
     /// The texture is given a retain-count of `1`, requiring one call to [`Self::free`] to free it.
     pub fn alloc(&mut self, name: String, image: ImageData, filter: TextureFilter) -> TextureId {
+        crate::epaint_assert!(
+            image.width() <= self.max_texture_side && image.height() <= self.max_texture_side,
+            "Texture {:?} has size {}x{}, but the maximum texture side is {}",
+            name,
+            image.width(),
+            image.height(),
+            self.max_texture_side
+        );
+
         let id = TextureId::Managed(self.next_id);
         self.next_id += 1;
 
