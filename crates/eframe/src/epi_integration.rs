@@ -228,7 +228,7 @@ impl EpiIntegration {
             pending_full_output: Default::default(),
             close: false,
             can_drag_window: false,
-            tex_manager: egui::epaint::default_texture_manager(max_texture_side),
+            tex_manager: egui::epaint::TextureManager::new(max_texture_side),
         }
     }
 

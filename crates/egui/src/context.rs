@@ -65,7 +65,7 @@ impl ContextImpl {
     /// Load fonts unless already loaded.
     fn update_fonts_mut(&mut self, tex_manager: &ArcTextureManager) {
         let pixels_per_point = self.input.pixels_per_point();
-        let max_texture_side = tex_manager.read().max_texture_side;
+        let max_texture_side = tex_manager.read().max_texture_side();
 
         if let Some(font_definitions) = self.memory.new_font_definitions.take() {
             let fonts = Fonts::new(pixels_per_point, max_texture_side, font_definitions);
@@ -738,7 +738,7 @@ impl Context {
     ) -> TextureHandle {
         let name = name.into();
         let image = image.into();
-        let max_texture_side = tex_manager.read().max_texture_side;
+        let max_texture_side = tex_manager.read().max_texture_side();
         crate::egui_assert!(
             image.width() <= max_texture_side && image.height() <= max_texture_side,
             "Texture {:?} has size {}x{}, but the maximum texture side is {}",

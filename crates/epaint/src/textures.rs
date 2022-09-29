@@ -1,11 +1,10 @@
-use crate::{ImageData, ImageDelta, TextureId};
+use crate::{mutex::RwLock, FontImage, ImageData, ImageDelta, TextureId};
 
-// ----------------------------------------------------------------------------
+pub type ArcTextureManager = std::sync::Arc<crate::mutex::RwLock<TextureManager>>;
 
 /// Low-level manager for allocating textures.
 ///
 /// Communicates with the painting subsystem using [`Self::take_delta`].
-#[derive(Default)]
 pub struct TextureManager {
     /// We allocate texture id:s linearly.
     next_id: u64,
@@ -16,10 +15,33 @@ pub struct TextureManager {
     /// Maximum size of one side of a texture.
     ///
     /// This depends on the backend.
-    pub max_texture_side: usize,
+    max_texture_side: usize,
 }
 
 impl TextureManager {
+    pub fn new(max_texture_side: usize) -> ArcTextureManager {
+        let mut tex_manager = Self {
+            next_id: 0,
+            metas: ahash::HashMap::default(),
+            delta: TexturesDelta::default(),
+            max_texture_side,
+        };
+
+        // Will be filled in later
+        let font_id = tex_manager.alloc(
+            "egui_font_texture".into(),
+            FontImage::new([0, 0]).into(),
+            Default::default(),
+        );
+        assert_eq!(font_id, TextureId::default());
+
+        std::sync::Arc::new(RwLock::new(tex_manager))
+    }
+
+    pub fn max_texture_side(&self) -> usize {
+        self.max_texture_side
+    }
+
     /// Allocate a new texture.
     ///
     /// The given name can be useful for later debugging.

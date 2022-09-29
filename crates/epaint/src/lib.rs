@@ -45,7 +45,7 @@ pub use {
     text::{FontFamily, FontId, Fonts, Galley},
     texture_atlas::TextureAtlas,
     texture_handle::TextureHandle,
-    textures::TextureManager,
+    textures::{ArcTextureManager, TextureManager},
 };
 
 pub use emath::{pos2, vec2, Pos2, Rect, Vec2};
@@ -157,21 +157,4 @@ pub fn f64_hash<H: std::hash::Hasher>(state: &mut H, f: f64) {
         use std::hash::Hash;
         f.to_bits().hash(state);
     }
-}
-
-pub type ArcTextureManager = std::sync::Arc<crate::mutex::RwLock<TextureManager>>;
-
-pub fn default_texture_manager(max_texture_side: usize) -> ArcTextureManager {
-    let mut tex_manager = TextureManager::default();
-    tex_manager.max_texture_side = max_texture_side;
-
-    // Will be filled in later
-    let font_id = tex_manager.alloc(
-        "egui_font_texture".into(),
-        FontImage::new([0, 0]).into(),
-        Default::default(),
-    );
-    assert_eq!(font_id, TextureId::default());
-
-    std::sync::Arc::new(mutex::RwLock::new(tex_manager))
 }
