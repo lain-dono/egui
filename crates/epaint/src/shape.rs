@@ -210,22 +210,13 @@ impl Shape {
     ) -> Self {
         let galley = fonts.layout_no_wrap(text.to_string(), font_id, color);
         let rect = anchor.anchor_rect(Rect::from_min_size(pos, galley.size()));
-        Self::galley(rect.min, galley)
-    }
-
-    #[inline]
-    pub fn galley(pos: Pos2, galley: Arc<Galley>) -> Self {
-        TextShape::new(pos, galley).into()
+        Self::galley(rect.min, galley, None)
     }
 
     #[inline]
     /// The text color in the [`Galley`] will be replaced with the given color.
-    pub fn galley_with_color(pos: Pos2, galley: Arc<Galley>, text_color: Color32) -> Self {
-        TextShape {
-            override_text_color: Some(text_color),
-            ..TextShape::new(pos, galley)
-        }
-        .into()
+    pub fn galley(pos: Pos2, galley: Arc<Galley>, override_text_color: Option<Color32>) -> Self {
+        TextShape::new(pos, galley, override_text_color).into()
     }
 
     pub fn mesh(mesh: Mesh) -> Self {
@@ -638,12 +629,12 @@ pub struct TextShape {
 
 impl TextShape {
     #[inline]
-    pub fn new(pos: Pos2, galley: Arc<Galley>) -> Self {
+    pub fn new(pos: Pos2, galley: Arc<Galley>, override_text_color: Option<Color32>) -> Self {
         Self {
             pos,
             galley,
             underline: Stroke::none(),
-            override_text_color: None,
+            override_text_color,
             angle: 0.0,
         }
     }

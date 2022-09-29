@@ -397,7 +397,7 @@ impl Line {
 /// a horizontal line at the given y-coordinate.
 fn y_intersection(p1: &Pos2, p2: &Pos2, y: f32) -> Option<f32> {
     ((p1.y > y && p2.y < y) || (p1.y < y && p2.y > y))
-        .then(|| ((y * (p1.x - p2.x)) - (p1.x * p2.y - p1.y * p2.x)) / (p1.y - p2.y))
+        .then_some(((y * (p1.x - p2.x)) - (p1.x * p2.y - p1.y * p2.x)) / (p1.y - p2.y))
 }
 
 impl PlotItem for Line {
@@ -691,7 +691,7 @@ impl PlotItem for Text {
             .anchor
             .anchor_rect(Rect::from_min_size(pos, galley.size()));
 
-        let mut text_shape = epaint::TextShape::new(rect.min, galley.galley);
+        let mut text_shape = epaint::TextShape::new(rect.min, galley.galley, None);
         if !galley.galley_has_color {
             text_shape.override_text_color = Some(color);
         }
@@ -835,7 +835,7 @@ impl PlotItem for Points {
         let default_stroke = Stroke::new(stroke_size, *color);
         let mut stem_stroke = default_stroke;
         let stroke = (!filled)
-            .then(|| default_stroke)
+            .then_some(default_stroke)
             .unwrap_or_else(Stroke::none);
         let fill = filled.then(|| *color).unwrap_or_default();
 
@@ -1233,20 +1233,22 @@ impl PlotItem for PlotImage {
 
 // ----------------------------------------------------------------------------
 
+pub type BarChartFn = Box<dyn Fn(&Bar, &BarChart) -> String>;
+
 /// A bar chart.
 pub struct BarChart {
     pub(super) bars: Vec<Bar>,
     pub(super) default_color: Color32,
     pub(super) name: String,
     /// A custom element formatter
-    pub(super) element_formatter: Option<Box<dyn Fn(&Bar, &BarChart) -> String>>,
+    pub(super) element_formatter: Option<BarChartFn>,
     highlight: bool,
 }
 
 impl BarChart {
     /// Create a bar chart. It defaults to vertically oriented elements.
     pub fn new(bars: Vec<Bar>) -> BarChart {
-        BarChart {
+        Self {
             bars,
             default_color: Color32::TRANSPARENT,
             name: String::new(),
@@ -1315,7 +1317,7 @@ impl BarChart {
 
     /// Add a custom way to format an element.
     /// Can be used to display a set number of decimals or custom labels.
-    pub fn element_formatter(mut self, formatter: Box<dyn Fn(&Bar, &BarChart) -> String>) -> Self {
+    pub fn element_formatter(mut self, formatter: BarChartFn) -> Self {
         self.element_formatter = Some(formatter);
         self
     }
@@ -1402,13 +1404,15 @@ impl PlotItem for BarChart {
     }
 }
 
+pub type BoxPlotFn = Box<dyn Fn(&BoxElem, &BoxPlot) -> String>;
+
 /// A diagram containing a series of [`BoxElem`] elements.
 pub struct BoxPlot {
     pub(super) boxes: Vec<BoxElem>,
     pub(super) default_color: Color32,
     pub(super) name: String,
     /// A custom element formatter
-    pub(super) element_formatter: Option<Box<dyn Fn(&BoxElem, &BoxPlot) -> String>>,
+    pub(super) element_formatter: Option<BoxPlotFn>,
     highlight: bool,
 }
 
@@ -1478,10 +1482,7 @@ impl BoxPlot {
 
     /// Add a custom way to format an element.
     /// Can be used to display a set number of decimals or custom labels.
-    pub fn element_formatter(
-        mut self,
-        formatter: Box<dyn Fn(&BoxElem, &BoxPlot) -> String>,
-    ) -> Self {
+    pub fn element_formatter(mut self, formatter: BoxPlotFn) -> Self {
         self.element_formatter = Some(formatter);
         self
     }
@@ -1638,7 +1639,7 @@ fn add_rulers_and_text(
 
     let corner_value = elem.corner_value();
     shapes.push(Shape::text(
-        &*plot.ui.fonts(),
+        &plot.ui.fonts(),
         plot.transform.position_from_point(&corner_value) + vec2(3.0, -2.0),
         Align2::LEFT_BOTTOM,
         text,
@@ -1695,7 +1696,7 @@ pub(super) fn rulers_at_value(
     let font_id = TextStyle::Body.resolve(plot.ui.style());
 
     shapes.push(Shape::text(
-        &*plot.ui.fonts(),
+        &plot.ui.fonts(),
         pointer + vec2(3.0, -2.0),
         Align2::LEFT_BOTTOM,
         text,

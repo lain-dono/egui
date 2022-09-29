@@ -136,7 +136,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
             prepared_discs,
         );
         let mut mesh = egui::epaint::Mesh::default();
-        let text_shape = TextShape::new(egui::Pos2::ZERO, galley);
+        let text_shape = TextShape::new(egui::Pos2::ZERO, galley, None);
         c.bench_function("tessellate_text", |b| {
             b.iter(|| {
                 tessellator.tessellate_text(&text_shape, &mut mesh);

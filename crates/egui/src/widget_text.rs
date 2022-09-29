@@ -706,11 +706,8 @@ impl WidgetTextGalley {
         text_pos: Pos2,
         text_color: Color32,
     ) {
-        if self.galley_has_color {
-            painter.galley(text_pos, self.galley);
-        } else {
-            painter.galley_with_color(text_pos, self.galley, text_color);
-        }
+        let text_color = self.galley_has_color.then_some(text_color);
+        painter.galley(text_pos, self.galley, text_color);
     }
 
     /// Paint with this specific color.
@@ -720,6 +717,6 @@ impl WidgetTextGalley {
         text_pos: Pos2,
         text_color: Color32,
     ) {
-        painter.galley_with_color(text_pos, self.galley, text_color);
+        painter.galley(text_pos, self.galley, Some(text_color));
     }
 }

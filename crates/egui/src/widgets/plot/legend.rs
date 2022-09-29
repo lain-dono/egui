@@ -5,7 +5,7 @@ use crate::*;
 use super::items::PlotItem;
 
 /// Where to place the plot legend.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Corner {
     LeftTop,
     RightTop,
@@ -143,7 +143,7 @@ impl LegendEntry {
         };
 
         let text_position = pos2(text_position_x, rect.center().y - 0.5 * galley.size().y);
-        painter.galley_with_color(text_position, galley, visuals.text_color());
+        painter.galley(text_position, galley, Some(visuals.text_color()));
 
         *checked ^= response.clicked_by(PointerButton::Primary);
         *hovered = response.hovered();
@@ -189,7 +189,7 @@ impl LegendWidget {
                         LegendEntry::new(color, checked)
                     });
             });
-        (!entries.is_empty()).then(|| Self {
+        (!entries.is_empty()).then_some(Self {
             rect,
             entries,
             config,

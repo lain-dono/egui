@@ -240,7 +240,7 @@ impl Painter {
             0.0,
             Color32::from_black_alpha(240),
         ));
-        self.galley(rect.min, galley);
+        self.galley(rect.min, galley, None);
         frame_rect
     }
 }
@@ -375,7 +375,7 @@ impl Painter {
     ) -> Rect {
         let galley = self.layout_no_wrap(text.to_string(), font_id, text_color);
         let rect = anchor.anchor_rect(Rect::from_min_size(pos, galley.size()));
-        self.galley(rect.min, galley);
+        self.galley(rect.min, galley, None);
         rect
     }
 
@@ -410,23 +410,11 @@ impl Painter {
     ///
     /// You can create the [`Galley`] with [`Self::layout`].
     ///
-    /// If you want to change the color of the text, use [`Self::galley_with_color`].
-    #[inline(always)]
-    pub fn galley(&self, pos: Pos2, galley: Arc<Galley>) {
-        if !galley.is_empty() {
-            self.add(Shape::galley(pos, galley));
-        }
-    }
-
-    /// Paint text that has already been layed out in a [`Galley`].
-    ///
-    /// You can create the [`Galley`] with [`Self::layout`].
-    ///
     /// The text color in the [`Galley`] will be replaced with the given color.
     #[inline(always)]
-    pub fn galley_with_color(&self, pos: Pos2, galley: Arc<Galley>, text_color: Color32) {
+    pub fn galley(&self, pos: Pos2, galley: Arc<Galley>, text_color: Option<Color32>) {
         if !galley.is_empty() {
-            self.add(Shape::galley_with_color(pos, galley, text_color));
+            self.add(Shape::galley(pos, galley, text_color));
         }
     }
 }

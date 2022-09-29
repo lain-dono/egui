@@ -1239,7 +1239,7 @@ impl PreparedPlot {
                         .at_most(transform.frame().max[1 - axis] - galley.size()[1 - axis] - 2.0)
                         .at_least(transform.frame().min[1 - axis] + 1.0);
 
-                    shapes.push(Shape::galley(text_pos, galley));
+                    shapes.push(Shape::galley(text_pos, galley, None));
                 }
             }
         }

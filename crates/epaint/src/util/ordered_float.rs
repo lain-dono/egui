@@ -27,20 +27,14 @@ impl<T: Float> PartialEq<Self> for OrderedFloat<T> {
 impl<T: Float> PartialOrd<Self> for OrderedFloat<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match self.0.partial_cmp(&other.0) {
-            Some(ord) => Some(ord),
-            None => Some(self.0.is_nan().cmp(&other.0.is_nan())),
-        }
+        Some(self.0.total_cmp(&other.0))
     }
 }
 
 impl<T: Float> Ord for OrderedFloat<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        match self.partial_cmp(other) {
-            Some(ord) => ord,
-            None => unreachable!(),
-        }
+        self.0.total_cmp(&other.0)
     }
 }
 
@@ -101,6 +95,8 @@ mod private {
     pub trait FloatImpl {
         fn is_nan(&self) -> bool;
 
+        fn total_cmp(&self, other: &Self) -> std::cmp::Ordering;
+
         fn hash<H: Hasher>(&self, state: &mut H);
     }
 
@@ -108,6 +104,11 @@ mod private {
         #[inline]
         fn is_nan(&self) -> bool {
             f32::is_nan(*self)
+        }
+
+        #[inline]
+        fn total_cmp(&self, other: &Self) -> std::cmp::Ordering {
+            f32::total_cmp(self, other)
         }
 
         #[inline]
@@ -120,6 +121,11 @@ mod private {
         #[inline]
         fn is_nan(&self) -> bool {
             f64::is_nan(*self)
+        }
+
+        #[inline]
+        fn total_cmp(&self, other: &Self) -> std::cmp::Ordering {
+            f64::total_cmp(self, other)
         }
 
         #[inline]

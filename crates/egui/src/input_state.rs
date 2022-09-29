@@ -378,7 +378,7 @@ impl InputState {
 // ----------------------------------------------------------------------------
 
 /// A pointer (mouse or touch) click.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Click {
     pub pos: Pos2,
     pub button: PointerButton,
@@ -398,7 +398,7 @@ impl Click {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PointerEvent {
     Moved(Pos2),
     Pressed {
