@@ -36,7 +36,7 @@ struct ContextImpl {
 }
 
 impl ContextImpl {
-    fn begin_frame_mut(&mut self, new_raw_input: RawInput) {
+    fn begin_frame_mut(&mut self, new_raw_input: RawInput, tex_manager: &ArcTextureManager) {
         self.memory.begin_frame(&self.input, &new_raw_input);
 
         self.input = std::mem::take(&mut self.input)
@@ -48,7 +48,7 @@ impl ContextImpl {
 
         self.frame_state.begin_frame(&self.input);
 
-        self.update_fonts_mut();
+        self.update_fonts_mut(tex_manager);
 
         // Ensure we register the background area so panels and background ui can catch clicks:
         let screen_rect = self.input.screen_rect();
@@ -63,9 +63,9 @@ impl ContextImpl {
     }
 
     /// Load fonts unless already loaded.
-    fn update_fonts_mut(&mut self) {
+    fn update_fonts_mut(&mut self, tex_manager: &ArcTextureManager) {
         let pixels_per_point = self.input.pixels_per_point();
-        let max_texture_side = self.input.max_texture_side;
+        let max_texture_side = tex_manager.read().max_texture_side;
 
         if let Some(font_definitions) = self.memory.new_font_definitions.take() {
             let fonts = Fonts::new(pixels_per_point, max_texture_side, font_definitions);
@@ -182,10 +182,10 @@ impl Context {
     pub fn run(
         &self,
         new_input: RawInput,
-        tex_manager: &RwLock<TextureManager>,
+        tex_manager: &ArcTextureManager,
         run_ui: impl FnOnce(&Context),
     ) -> FullOutput {
-        self.begin_frame(new_input);
+        self.begin_frame(new_input, tex_manager);
         run_ui(self);
         self.end_frame(tex_manager)
     }
@@ -207,8 +207,8 @@ impl Context {
     /// let full_output = ctx.end_frame();
     /// // handle full_output
     /// ```
-    pub fn begin_frame(&self, new_input: RawInput) {
-        self.write().begin_frame_mut(new_input);
+    pub fn begin_frame(&self, new_input: RawInput, tex_manager: &ArcTextureManager) {
+        self.write().begin_frame_mut(new_input, tex_manager);
     }
 
     // ---------------------------------------------------------------------
@@ -738,7 +738,7 @@ impl Context {
     ) -> TextureHandle {
         let name = name.into();
         let image = image.into();
-        let max_texture_side = self.input().max_texture_side;
+        let max_texture_side = tex_manager.read().max_texture_side;
         crate::egui_assert!(
             image.width() <= max_texture_side && image.height() <= max_texture_side,
             "Texture {:?} has size {}x{}, but the maximum texture side is {}",

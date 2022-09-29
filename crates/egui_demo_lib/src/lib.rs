@@ -64,7 +64,7 @@ fn test_egui_e2e() {
     let mut demo_windows = crate::DemoWindows::default();
     let ctx = egui::Context::default();
     let raw_input = egui::RawInput::default();
-    let tex_manager = egui::epaint::default_texture_manager();
+    let tex_manager = egui::epaint::default_texture_manager(2048);
 
     const NUM_FRAMES: usize = 5;
     for _ in 0..NUM_FRAMES {
@@ -84,7 +84,7 @@ fn test_egui_zero_window_size() {
         screen_rect: Some(egui::Rect::from_min_max(egui::Pos2::ZERO, egui::Pos2::ZERO)),
         ..Default::default()
     };
-    let tex_manager = egui::epaint::default_texture_manager();
+    let tex_manager = egui::epaint::default_texture_manager(2048);
 
     const NUM_FRAMES: usize = 5;
     for _ in 0..NUM_FRAMES {

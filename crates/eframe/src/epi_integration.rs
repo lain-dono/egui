@@ -217,7 +217,6 @@ impl EpiIntegration {
         };
 
         let mut egui_winit = egui_winit::State::new(event_loop);
-        egui_winit.set_max_texture_side(max_texture_side);
         let pixels_per_point = window.scale_factor() as f32;
         egui_winit.set_pixels_per_point(pixels_per_point);
 
@@ -229,7 +228,7 @@ impl EpiIntegration {
             pending_full_output: Default::default(),
             close: false,
             can_drag_window: false,
-            tex_manager: egui::epaint::default_texture_manager(),
+            tex_manager: egui::epaint::default_texture_manager(max_texture_side),
         }
     }
 

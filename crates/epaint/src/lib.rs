@@ -161,8 +161,9 @@ pub fn f64_hash<H: std::hash::Hasher>(state: &mut H, f: f64) {
 
 pub type ArcTextureManager = std::sync::Arc<crate::mutex::RwLock<TextureManager>>;
 
-pub fn default_texture_manager() -> ArcTextureManager {
+pub fn default_texture_manager(max_texture_side: usize) -> ArcTextureManager {
     let mut tex_manager = TextureManager::default();
+    tex_manager.max_texture_side = max_texture_side;
 
     // Will be filled in later
     let font_id = tex_manager.alloc(

@@ -12,6 +12,11 @@ pub struct TextureManager {
     /// Information about currently allocated textures.
     metas: ahash::HashMap<TextureId, TextureMeta>,
     delta: TexturesDelta,
+
+    /// Maximum size of one side of a texture.
+    ///
+    /// This depends on the backend.
+    pub max_texture_side: usize,
 }
 
 impl TextureManager {

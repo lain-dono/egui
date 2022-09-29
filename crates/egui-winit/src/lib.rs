@@ -91,12 +91,6 @@ impl State {
         }
     }
 
-    /// Call this once a graphics context has been created to update the maximum texture dimensions
-    /// that egui will use.
-    pub fn set_max_texture_side(&mut self, max_texture_side: usize) {
-        self.egui_input.max_texture_side = Some(max_texture_side);
-    }
-
     /// Call this when a new native Window is created for rendering to initialize the `pixels_per_point`
     /// for that window.
     ///
