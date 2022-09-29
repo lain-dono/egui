@@ -20,18 +20,14 @@ cargo test --workspace --all-targets --all-features
 cargo test --workspace --doc # slow - checks all doc-tests
 cargo fmt --all -- --check
 
-cargo doc -p eframe -p egui -p egui_demo_lib -p egui_extras -p egui_glium -p egui_glow -p egui-winit -p emath -p epaint --lib --no-deps --all-features
+cargo doc -p eframe -p egui -p egui_demo_lib -p egui_extras -p egui-winit -p emath -p epaint --lib --no-deps --all-features
 cargo doc --document-private-items --no-deps --all-features
 
-(cd crates/eframe && cargo check --no-default-features --features "glow")
-(cd crates/eframe && cargo check --no-default-features --features "wgpu")
+(cd crates/eframe && cargo check --no-default-features)
 (cd crates/egui && cargo check --no-default-features --features "serde")
-(cd crates/egui_demo_app && cargo check --no-default-features --features "glow")
-(cd crates/egui_demo_app && cargo check --no-default-features --features "wgpu")
+(cd crates/egui_demo_app && cargo check --no-default-features)
 (cd crates/egui_demo_lib && cargo check --no-default-features)
 (cd crates/egui_extras && cargo check --no-default-features)
-(cd crates/egui_glium && cargo check --no-default-features)
-(cd crates/egui_glow && cargo check --no-default-features)
 (cd crates/egui-winit && cargo check --no-default-features)
 (cd crates/emath && cargo check --no-default-features)
 (cd crates/epaint && cargo check --no-default-features --release)
@@ -41,8 +37,6 @@ cargo doc --document-private-items --no-deps --all-features
 (cd crates/egui && cargo check --all-features)
 (cd crates/egui_demo_app && cargo check --all-features)
 (cd crates/egui_extras && cargo check --all-features)
-(cd crates/egui_glium && cargo check --all-features)
-(cd crates/egui_glow && cargo check --all-features)
 (cd crates/egui-winit && cargo check --all-features)
 (cd crates/emath && cargo check --all-features)
 (cd crates/epaint && cargo check --all-features)

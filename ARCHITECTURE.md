@@ -29,12 +29,6 @@ This crates provides bindings between [`egui`](https://github.com/emilk/egui) an
 
 The library translates winit events to egui, handled copy/paste, updates the cursor, open links clicked in egui, etc.
 
-### `egui_glium`
-Puts an egui app inside a native window on your laptop. Paints the triangles that egui outputs using [glium](https://github.com/glium/glium).
-
-### `egui_glow`
-Puts an egui app inside a native window on your laptop. Paints the triangles that egui outputs using [glow](https://github.com/grovesNL/glow).
-
 ### `eframe`
 `eframe` is the official `egui` framework, built so you can compile the same app for either web or native.
 

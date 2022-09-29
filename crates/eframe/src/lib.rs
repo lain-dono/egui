@@ -63,10 +63,6 @@
 // Re-export all useful libraries:
 pub use {egui, egui::emath, egui::epaint};
 
-#[cfg(feature = "glow")]
-pub use {egui_glow, glow};
-
-#[cfg(feature = "wgpu")]
 pub use {egui_wgpu, wgpu};
 
 mod epi;
@@ -74,56 +70,12 @@ mod epi;
 // Re-export everything in `epi` so `eframe` users don't have to care about what `epi` is:
 pub use epi::*;
 
-// ----------------------------------------------------------------------------
-// When compiling for web
+mod epi_integration;
+pub mod run;
 
-#[cfg(target_arch = "wasm32")]
-pub mod web;
-
-#[cfg(target_arch = "wasm32")]
-pub use wasm_bindgen;
-
-#[cfg(target_arch = "wasm32")]
-use web::AppRunnerRef;
-
-#[cfg(target_arch = "wasm32")]
-pub use web_sys;
-
-/// Install event listeners to register different input events
-/// and start running the given app.
-///
-/// ``` no_run
-/// #[cfg(target_arch = "wasm32")]
-/// use wasm_bindgen::prelude::*;
-///
-/// /// This is the entry-point for all the web-assembly.
-/// /// This is called from the HTML.
-/// /// It loads the app, installs some callbacks, then returns.
-/// /// It returns a handle to the running app that can be stopped calling `AppRunner::stop_web`.
-/// /// You can add more callbacks like this if you want to call in to your code.
-/// #[cfg(target_arch = "wasm32")]
-/// #[wasm_bindgen]
-/// pub fn start(canvas_id: &str) -> Result<AppRunnerRef>, eframe::wasm_bindgen::JsValue> {
-///     let web_options = eframe::WebOptions::default();
-///     eframe::start_web(canvas_id, web_options, Box::new(|cc| Box::new(MyEguiApp::new(cc))))
-/// }
-/// ```
-#[cfg(target_arch = "wasm32")]
-pub fn start_web(
-    canvas_id: &str,
-    web_options: WebOptions,
-    app_creator: AppCreator,
-) -> Result<AppRunnerRef, wasm_bindgen::JsValue> {
-    let handle = web::start(canvas_id, web_options, app_creator)?;
-
-    Ok(handle)
-}
-
-// ----------------------------------------------------------------------------
-// When compiling natively
-
-#[cfg(not(target_arch = "wasm32"))]
-mod native;
+/// File storage which can be used by native backends.
+#[cfg(feature = "persistence")]
+pub mod file_storage;
 
 /// This is how you start a native (desktop) app.
 ///
@@ -160,46 +112,27 @@ mod native;
 ///    }
 /// }
 /// ```
-#[cfg(not(target_arch = "wasm32"))]
 #[allow(clippy::needless_pass_by_value)]
 pub fn run_native(app_name: &str, native_options: NativeOptions, app_creator: AppCreator) {
-    let renderer = native_options.renderer;
-
-    match renderer {
-        #[cfg(feature = "glow")]
-        Renderer::Glow => {
-            tracing::debug!("Using the glow renderer");
-            native::run::run_glow(app_name, &native_options, app_creator);
-        }
-
-        #[cfg(feature = "wgpu")]
-        Renderer::Wgpu => {
-            tracing::debug!("Using the wgpu renderer");
-            native::run::run_wgpu(app_name, &native_options, app_creator);
-        }
-    }
+    crate::run::run_wgpu(app_name, &native_options, app_creator);
 }
 
 // ---------------------------------------------------------------------------
 
 /// Profiling macro for feature "puffin"
-#[cfg(not(target_arch = "wasm32"))]
 macro_rules! profile_function {
     ($($arg: tt)*) => {
         #[cfg(feature = "puffin")]
         puffin::profile_function!($($arg)*);
     };
 }
-#[cfg(not(target_arch = "wasm32"))]
 pub(crate) use profile_function;
 
 /// Profiling macro for feature "puffin"
-#[cfg(not(target_arch = "wasm32"))]
 macro_rules! profile_scope {
     ($($arg: tt)*) => {
         #[cfg(feature = "puffin")]
         puffin::profile_scope!($($arg)*);
     };
 }
-#[cfg(not(target_arch = "wasm32"))]
 pub(crate) use profile_scope;

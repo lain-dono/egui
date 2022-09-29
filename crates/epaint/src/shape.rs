@@ -798,9 +798,8 @@ pub struct PaintCallback {
 
     /// Paint something custom (e.g. 3D stuff).
     ///
-    /// The concrete value of `callback` depends on the rendering backend used. For instance, the
-    /// `glow` backend requires that callback be an `egui_glow::CallbackFn` while the `wgpu`
-    /// backend requires a `egui_wgpu::CallbackFn`.
+    /// The concrete value of `callback` depends on the rendering backend used. For instance,
+    /// the `wgpu` backend requires a `egui_wgpu::CallbackFn`.
     ///
     /// If the type cannnot be downcast to the type expected by the current backend the callback
     /// will not be drawn.

@@ -195,8 +195,7 @@ impl EpiIntegration {
         window: &winit::window::Window,
         system_theme: Option<Theme>,
         storage: Option<Box<dyn epi::Storage>>,
-        #[cfg(feature = "glow")] gl: Option<std::sync::Arc<glow::Context>>,
-        #[cfg(feature = "wgpu")] wgpu_render_state: Option<egui_wgpu::RenderState>,
+        wgpu_render_state: Option<egui_wgpu::RenderState>,
     ) -> Self {
         let egui_ctx = egui::Context::default();
 
@@ -211,9 +210,6 @@ impl EpiIntegration {
             },
             output: Default::default(),
             storage,
-            #[cfg(feature = "glow")]
-            gl,
-            #[cfg(feature = "wgpu")]
             wgpu_render_state,
         };
 

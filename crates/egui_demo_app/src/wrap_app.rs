@@ -1,8 +1,5 @@
 use egui_demo_lib::is_mobile;
 
-#[cfg(feature = "glow")]
-use eframe::glow;
-
 #[derive(Default)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 struct EasyMarkApp {
@@ -93,10 +90,7 @@ pub struct State {
 /// Wraps many demo/test apps into one.
 pub struct WrapApp {
     state: State,
-
-    #[cfg(any(feature = "glow", feature = "wgpu"))]
     custom3d: crate::apps::Custom3d,
-
     dropped_files: Vec<egui::DroppedFile>,
 }
 
@@ -106,7 +100,6 @@ impl WrapApp {
         let mut slf = Self {
             state: State::default(),
 
-            #[cfg(any(feature = "glow", feature = "wgpu"))]
             custom3d: crate::apps::Custom3d::new(_cc),
 
             dropped_files: Default::default(),
@@ -147,7 +140,6 @@ impl WrapApp {
             ),
         ];
 
-        #[cfg(any(feature = "glow", feature = "wgpu"))]
         vec.push((
             "🔺 3D painting",
             "custom3d",
@@ -215,11 +207,6 @@ impl eframe::App for WrapApp {
         self.state.backend_panel.end_of_frame(ctx);
 
         self.ui_file_drag_and_drop(ctx);
-    }
-
-    #[cfg(feature = "glow")]
-    fn on_exit(&mut self, gl: Option<&glow::Context>) {
-        self.custom3d.on_exit(gl);
     }
 }
 

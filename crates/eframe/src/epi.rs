@@ -25,19 +25,11 @@ pub struct CreationContext<'s> {
     /// You can use the storage to restore app state(requires the "persistence" feature).
     pub storage: Option<&'s dyn Storage>,
 
-    /// The [`glow::Context`] allows you to initialize OpenGL resources (e.g. shaders) that
-    /// you might want to use later from a [`egui::PaintCallback`].
-    ///
-    /// Only available when compiling with the `glow` feature and using [`Renderer::Glow`].
-    #[cfg(feature = "glow")]
-    pub gl: Option<std::sync::Arc<glow::Context>>,
-
     /// The underlying WGPU render state.
     ///
     /// Only available when compiling with the `wgpu` feature and using [`Renderer::Wgpu`].
     ///
     /// Can be used to manage GPU resources for custom rendering with WGPU using [`egui::PaintCallback`]s.
-    #[cfg(feature = "wgpu")]
     pub wgpu_render_state: Option<egui_wgpu::RenderState>,
 }
 
@@ -86,16 +78,6 @@ pub trait App {
     /// Called once on shutdown, after [`Self::save`].
     ///
     /// If you need to abort an exit use [`Self::on_close_event`].
-    ///
-    /// To get a [`glow`] context you need to compile with the `glow` feature flag,
-    /// and run eframe with the glow backend.
-    #[cfg(feature = "glow")]
-    fn on_exit(&mut self, _gl: Option<&glow::Context>) {}
-
-    /// Called once on shutdown, after [`Self::save`].
-    ///
-    /// If you need to abort an exit use [`Self::on_close_event`].
-    #[cfg(not(feature = "glow"))]
     fn on_exit(&mut self) {}
 
     // ---------
@@ -260,9 +242,6 @@ pub struct NativeOptions {
     /// Default: [`HardwareAcceleration::Preferred`].
     pub hardware_acceleration: HardwareAcceleration,
 
-    /// What rendering backend to use.
-    pub renderer: Renderer,
-
     /// Only used if the `dark-light` feature is enabled:
     ///
     /// Try to detect and follow the system preferred setting for dark vs light mode.
@@ -315,7 +294,6 @@ impl Default for NativeOptions {
             depth_buffer: 0,
             stencil_buffer: 0,
             hardware_acceleration: HardwareAcceleration::Preferred,
-            renderer: Renderer::default(),
             follow_system_theme: cfg!(target_os = "macos") || cfg!(target_os = "windows"),
             default_theme: Theme::Dark,
             run_and_return: true,
@@ -427,67 +405,6 @@ pub enum WebGlContextOption {
 
 // ----------------------------------------------------------------------------
 
-/// What rendering backend to use.
-///
-/// You need to enable the "glow" and "wgpu" features to have a choice.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
-pub enum Renderer {
-    /// Use [`egui_glow`] renderer for [`glow`](https://github.com/grovesNL/glow).
-    #[cfg(feature = "glow")]
-    Glow,
-
-    /// Use [`egui_wgpu`] renderer for [`wgpu`](https://github.com/gfx-rs/wgpu).
-    #[cfg(feature = "wgpu")]
-    Wgpu,
-}
-
-impl Default for Renderer {
-    fn default() -> Self {
-        #[cfg(feature = "glow")]
-        return Self::Glow;
-
-        #[cfg(not(feature = "glow"))]
-        #[cfg(feature = "wgpu")]
-        return Self::Wgpu;
-
-        #[cfg(not(feature = "glow"))]
-        #[cfg(not(feature = "wgpu"))]
-        compile_error!("eframe: you must enable at least one of the rendering backend features: 'glow' or 'wgpu'");
-    }
-}
-
-impl std::fmt::Display for Renderer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            #[cfg(feature = "glow")]
-            Self::Glow => "glow".fmt(f),
-
-            #[cfg(feature = "wgpu")]
-            Self::Wgpu => "wgpu".fmt(f),
-        }
-    }
-}
-
-impl std::str::FromStr for Renderer {
-    type Err = String;
-
-    fn from_str(name: &str) -> Result<Self, String> {
-        match name.to_lowercase().as_str() {
-            #[cfg(feature = "glow")]
-            "glow" => Ok(Self::Glow),
-
-            #[cfg(feature = "wgpu")]
-            "wgpu" => Ok(Self::Wgpu),
-
-            _ => Err(format!("eframe renderer {name:?} is not available. Make sure that the corresponding eframe feature is enabled."))
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------
-
 /// Image data for an application icon.
 #[derive(Clone)]
 pub struct IconData {
@@ -515,12 +432,7 @@ pub struct Frame {
     /// A place where you can store custom data in a way that persists when you restart the app.
     pub(crate) storage: Option<Box<dyn Storage>>,
 
-    /// A reference to the underlying [`glow`] (OpenGL) context.
-    #[cfg(feature = "glow")]
-    pub(crate) gl: Option<std::sync::Arc<glow::Context>>,
-
     /// Can be used to manage GPU resources for custom rendering with WGPU using [`egui::PaintCallback`]s.
-    #[cfg(feature = "wgpu")]
     pub(crate) wgpu_render_state: Option<egui_wgpu::RenderState>,
 }
 
@@ -548,29 +460,11 @@ impl Frame {
         self.storage.as_deref_mut()
     }
 
-    /// A reference to the underlying [`glow`] (OpenGL) context.
-    ///
-    /// This can be used, for instance, to:
-    /// * Render things to offscreen buffers.
-    /// * Read the pixel buffer from the previous frame (`glow::Context::read_pixels`).
-    /// * Render things behind the egui windows.
-    ///
-    /// Note that all egui painting is deferred to after the call to [`App::update`]
-    /// ([`egui`] only collects [`egui::Shape`]s and then eframe paints them all in one go later on).
-    ///
-    /// To get a [`glow`] context you need to compile with the `glow` feature flag,
-    /// and run eframe using [`Renderer::Glow`].
-    #[cfg(feature = "glow")]
-    pub fn gl(&self) -> Option<&std::sync::Arc<glow::Context>> {
-        self.gl.as_ref()
-    }
-
     /// The underlying WGPU render state.
     ///
     /// Only available when compiling with the `wgpu` feature and using [`Renderer::Wgpu`].
     ///
     /// Can be used to manage GPU resources for custom rendering with WGPU using [`egui::PaintCallback`]s.
-    #[cfg(feature = "wgpu")]
     pub fn wgpu_render_state(&self) -> Option<&egui_wgpu::RenderState> {
         self.wgpu_render_state.as_ref()
     }
@@ -818,11 +712,11 @@ pub(crate) mod backend {
         #[cfg(not(target_arch = "wasm32"))]
         pub close: bool,
 
-        /// Set to some size to resize the outer window (e.g. glium window) to this size.
+        /// Set to some size to resize the outer window to this size.
         #[cfg(not(target_arch = "wasm32"))]
         pub window_size: Option<egui::Vec2>,
 
-        /// Set to some string to rename the outer window (e.g. glium window) to this title.
+        /// Set to some string to rename the outer window to this title.
         #[cfg(not(target_arch = "wasm32"))]
         pub window_title: Option<String>,
 
@@ -838,7 +732,7 @@ pub(crate) mod backend {
         #[cfg(not(target_arch = "wasm32"))]
         pub drag_window: bool,
 
-        /// Set to some position to move the outer window (e.g. glium window) to this position
+        /// Set to some position to move the outer window to this position
         #[cfg(not(target_arch = "wasm32"))]
         pub window_pos: Option<egui::Pos2>,
 

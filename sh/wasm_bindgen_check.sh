@@ -6,7 +6,7 @@ cd "$script_path/.."
 ./sh/setup_web.sh
 
 CRATE_NAME="egui_demo_app"
-FEATURES="glow,http,persistence,screen_reader"
+FEATURES="wgpu,http,persistence,screen_reader"
 
 # This is required to enable the web_sys clipboard API which eframe web uses
 # https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Clipboard.html
