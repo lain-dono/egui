@@ -13,7 +13,7 @@ const WHITE: Color32 = Color32::WHITE;
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct ColorTest {
     #[cfg_attr(feature = "serde", serde(skip))]
-    tex_mngr: TextureManager,
+    textures: HashMap<Gradient, TextureHandle>,
     vertex_gradients: bool,
     texture_gradients: bool,
     srgb: bool,
@@ -22,7 +22,7 @@ pub struct ColorTest {
 impl Default for ColorTest {
     fn default() -> Self {
         Self {
-            tex_mngr: Default::default(),
+            textures: Default::default(),
             vertex_gradients: true,
             texture_gradients: true,
             srgb: false,
@@ -78,12 +78,20 @@ impl ColorTest {
             }
 
             ui.horizontal(|ui| {
-                let g = Gradient::one_color(Color32::from(tex_color));
-                let tex = self.tex_mngr.get(ui.ctx(), &g);
-                let texel_offset = 0.5 / (g.0.len() as f32);
+                let gradient = Gradient::one_color(Color32::from(tex_color));
+
+                let tex = self
+                    .textures
+                    .entry(gradient.clone())
+                    .or_insert_with(|| create_texture(ui.ctx(), &gradient));
+
+                let texel_offset = 0.5 / (gradient.0.len() as f32);
                 let uv = Rect::from_min_max(pos2(texel_offset, 0.0), pos2(1.0 - texel_offset, 1.0));
                 ui.add(Image::new(tex, GRADIENT_SIZE).tint(vertex_color).uv(uv))
-                    .on_hover_text(format!("A texture that is {} texels wide", g.0.len()));
+                    .on_hover_text(format!(
+                        "A texture that is {} texels wide",
+                        gradient.0.len()
+                    ));
                 ui.label("GPU result");
             });
         });
@@ -204,7 +212,11 @@ impl ColorTest {
             return;
         }
         ui.horizontal(|ui| {
-            let tex = self.tex_mngr.get(ui.ctx(), gradient);
+            let tex = self
+                .textures
+                .entry(gradient.clone())
+                .or_insert_with(|| create_texture(ui.ctx(), gradient));
+
             let texel_offset = 0.5 / (gradient.0.len() as f32);
             let uv = Rect::from_min_max(pos2(texel_offset, 0.0), pos2(1.0 - texel_offset, 1.0));
             ui.add(Image::new(tex, GRADIENT_SIZE).bg_fill(bg_fill).uv(uv))
@@ -322,25 +334,14 @@ impl Gradient {
     }
 }
 
-#[derive(Default)]
-struct TextureManager(HashMap<Gradient, TextureHandle>);
-
-impl TextureManager {
-    fn get(&mut self, ctx: &egui::Context, gradient: &Gradient) -> &TextureHandle {
-        self.0.entry(gradient.clone()).or_insert_with(|| {
-            let pixels = gradient.to_pixel_row();
-            let width = pixels.len();
-            let height = 1;
-            ctx.load_texture(
-                "color_test_gradient",
-                epaint::ColorImage {
-                    size: [width, height],
-                    pixels,
-                },
-                TextureFilter::Linear,
-            )
-        })
-    }
+fn create_texture(ctx: &egui::Context, gradient: &Gradient) -> TextureHandle {
+    let pixels = gradient.to_pixel_row();
+    let size = [pixels.len(), 1];
+    ctx.load_texture(
+        "color_test_gradient",
+        epaint::ColorImage { size, pixels },
+        TextureFilter::Linear,
+    )
 }
 
 fn pixel_test(ui: &mut Ui) {
