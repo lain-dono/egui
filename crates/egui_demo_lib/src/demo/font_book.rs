@@ -21,16 +21,21 @@ impl super::Demo for FontBook {
         "🔤 Font Book"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name()).open(open).show(ctx, |ui| {
             use super::View as _;
-            self.ui(ui);
+            self.ui(ui, tex_manager);
         });
     }
 }
 
 impl super::View for FontBook {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.vertical_centered(|ui| {
             ui.add(crate::egui_github_link_file!());
         });

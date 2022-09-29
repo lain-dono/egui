@@ -1,4 +1,6 @@
+use egui::epaint::ArcTextureManager;
 use egui::mutex::Mutex;
+use egui::ColorImage;
 use egui::TextureFilter;
 
 /// An image to be shown in egui.
@@ -124,47 +126,64 @@ impl RetainedImage {
     }
 
     /// The texture if for this image.
-    pub fn texture_id(&self, ctx: &egui::Context) -> egui::TextureId {
+    pub fn texture_id(
+        &self,
+        ctx: &egui::Context,
+        tex_manager: &ArcTextureManager,
+    ) -> egui::TextureId {
         self.texture
             .lock()
             .get_or_insert_with(|| {
                 let image: &mut ColorImage = &mut self.image.lock();
                 let image = std::mem::take(image);
-                ctx.load_texture(&self.debug_name, image, self.filter)
+                ctx.load_texture(tex_manager.clone(), &self.debug_name, image, self.filter)
             })
             .id()
     }
 
     /// Show the image with the given maximum size.
-    pub fn show_max_size(&self, ui: &mut egui::Ui, max_size: egui::Vec2) -> egui::Response {
+    pub fn show_max_size(
+        &self,
+        ui: &mut egui::Ui,
+        tex_manager: &ArcTextureManager,
+        max_size: egui::Vec2,
+    ) -> egui::Response {
         let mut desired_size = self.size_vec2();
         desired_size *= (max_size.x / desired_size.x).min(1.0);
         desired_size *= (max_size.y / desired_size.y).min(1.0);
-        self.show_size(ui, desired_size)
+        self.show_size(ui, tex_manager, desired_size)
     }
 
     /// Show the image with the original size (one image pixel = one gui point).
-    pub fn show(&self, ui: &mut egui::Ui) -> egui::Response {
-        self.show_size(ui, self.size_vec2())
+    pub fn show(&self, ui: &mut egui::Ui, tex_manager: &ArcTextureManager) -> egui::Response {
+        self.show_size(ui, tex_manager, self.size_vec2())
     }
 
     /// Show the image with the given scale factor (1.0 = original size).
-    pub fn show_scaled(&self, ui: &mut egui::Ui, scale: f32) -> egui::Response {
-        self.show_size(ui, self.size_vec2() * scale)
+    pub fn show_scaled(
+        &self,
+        ui: &mut egui::Ui,
+        tex_manager: &ArcTextureManager,
+        scale: f32,
+    ) -> egui::Response {
+        self.show_size(ui, tex_manager, self.size_vec2() * scale)
     }
 
     /// Show the image with the given size.
-    pub fn show_size(&self, ui: &mut egui::Ui, desired_size: egui::Vec2) -> egui::Response {
+    pub fn show_size(
+        &self,
+        ui: &mut egui::Ui,
+        tex_manager: &ArcTextureManager,
+        desired_size: egui::Vec2,
+    ) -> egui::Response {
         // We need to convert the SVG to a texture to display it:
         // Future improvement: tell backend to do mip-mapping of the image to
         // make it look smoother when downsized.
-        ui.image(self.texture_id(ui.ctx()), desired_size)
+        ui.image(self.texture_id(ui.ctx(), tex_manager), desired_size)
     }
 }
 
 // ----------------------------------------------------------------------------
-
-use egui::ColorImage;
 
 /// Load a (non-svg) image.
 ///

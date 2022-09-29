@@ -1,6 +1,4 @@
-use std::f64::consts::TAU;
-use std::ops::RangeInclusive;
-
+use egui::epaint::ArcTextureManager;
 use egui::plot::{GridInput, GridMark};
 use egui::*;
 use plot::{
@@ -8,6 +6,8 @@ use plot::{
     Legend, Line, LineStyle, MarkerShape, Plot, PlotImage, PlotPoint, PlotPoints, Points, Polygon,
     Text, VLine,
 };
+use std::f64::consts::TAU;
+use std::ops::RangeInclusive;
 
 // ----------------------------------------------------------------------------
 
@@ -546,7 +546,7 @@ struct ItemsDemo {
 }
 
 impl ItemsDemo {
-    fn ui(&mut self, ui: &mut Ui) -> Response {
+    fn ui(&mut self, ui: &mut Ui, tex_manager: &ArcTextureManager) -> Response {
         let n = 100;
         let mut sin_values: Vec<_> = (0..=n)
             .map(|i| remap(i as f64, 0.0..=n as f64, -TAU..=TAU))
@@ -579,6 +579,7 @@ impl ItemsDemo {
 
         let texture: &egui::TextureHandle = self.texture.get_or_insert_with(|| {
             ui.ctx().load_texture(
+                tex_manager.clone(),
                 "plot_demo",
                 egui::ColorImage::example(),
                 egui::TextureFilter::Linear,
@@ -890,18 +891,18 @@ impl super::Demo for PlotDemo {
         "🗠 Plot"
     }
 
-    fn show(&mut self, ctx: &Context, open: &mut bool) {
+    fn show(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager, open: &mut bool) {
         use super::View as _;
         Window::new(self.name())
             .open(open)
             .default_size(vec2(400.0, 400.0))
             .vscroll(false)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for PlotDemo {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, tex_manager: &egui::ArcTextureManager) {
         ui.horizontal(|ui| {
             egui::reset_button(ui, self);
             ui.collapsing("Instructions", |ui| {
@@ -945,7 +946,7 @@ impl super::View for PlotDemo {
                 self.charts_demo.ui(ui);
             }
             Panel::Items => {
-                self.items_demo.ui(ui);
+                self.items_demo.ui(ui, tex_manager);
             }
             Panel::Interaction => {
                 self.interaction_demo.ui(ui);

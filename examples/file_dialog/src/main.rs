@@ -21,7 +21,12 @@ struct MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.label("Drag-and-drop files onto the window!");
 

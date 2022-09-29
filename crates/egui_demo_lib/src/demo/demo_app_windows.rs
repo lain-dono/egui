@@ -65,11 +65,11 @@ impl Demos {
         }
     }
 
-    pub fn windows(&mut self, ctx: &Context) {
+    pub fn windows(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
         let Self { demos, open } = self;
         for demo in demos {
             let mut is_open = open.contains(demo.name());
-            demo.show(ctx, &mut is_open);
+            demo.show(ctx, tex_manager, &mut is_open);
             set_open(open, demo.name(), is_open);
         }
     }
@@ -120,11 +120,11 @@ impl Tests {
         }
     }
 
-    pub fn windows(&mut self, ctx: &Context) {
+    pub fn windows(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
         let Self { demos, open } = self;
         for demo in demos {
             let mut is_open = open.contains(demo.name());
-            demo.show(ctx, &mut is_open);
+            demo.show(ctx, tex_manager, &mut is_open);
             set_open(open, demo.name(), is_open);
         }
     }
@@ -167,15 +167,15 @@ impl Default for DemoWindows {
 
 impl DemoWindows {
     /// Show the app ui (menu bar and windows).
-    pub fn ui(&mut self, ctx: &Context) {
+    pub fn ui(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
         if is_mobile(ctx) {
-            self.mobile_ui(ctx);
+            self.mobile_ui(ctx, tex_manager);
         } else {
-            self.desktop_ui(ctx);
+            self.desktop_ui(ctx, tex_manager);
         }
     }
 
-    fn mobile_ui(&mut self, ctx: &Context) {
+    fn mobile_ui(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
         if self.about_is_open {
             let screen_size = ctx.input().screen_rect.size();
             let default_width = (screen_size.x - 20.0).min(400.0);
@@ -190,7 +190,7 @@ impl DemoWindows {
                 .resizable(false)
                 .collapsible(false)
                 .show(ctx, |ui| {
-                    self.about.ui(ui);
+                    self.about.ui(ui, tex_manager);
                     ui.add_space(12.0);
                     ui.vertical_centered_justified(|ui| {
                         if ui
@@ -204,7 +204,7 @@ impl DemoWindows {
             self.about_is_open &= !close;
         } else {
             self.mobile_top_bar(ctx);
-            self.show_windows(ctx);
+            self.show_windows(ctx, tex_manager);
         }
     }
 
@@ -236,7 +236,7 @@ impl DemoWindows {
         });
     }
 
-    fn desktop_ui(&mut self, ctx: &Context) {
+    fn desktop_ui(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
         egui::SidePanel::right("egui_demo_panel")
             .resizable(false)
             .default_width(145.0)
@@ -269,14 +269,14 @@ impl DemoWindows {
             });
         });
 
-        self.show_windows(ctx);
+        self.show_windows(ctx, tex_manager);
     }
 
     /// Show the open windows.
-    fn show_windows(&mut self, ctx: &Context) {
-        self.about.show(ctx, &mut self.about_is_open);
-        self.demos.windows(ctx);
-        self.tests.windows(ctx);
+    fn show_windows(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager) {
+        self.about.show(ctx, tex_manager, &mut self.about_is_open);
+        self.demos.windows(ctx, tex_manager);
+        self.tests.windows(ctx, tex_manager);
     }
 
     fn demo_list_ui(&mut self, ui: &mut egui::Ui) {

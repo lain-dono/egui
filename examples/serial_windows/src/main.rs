@@ -42,7 +42,12 @@ fn main() {
 struct MyApp {}
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default().show(ctx, |ui| {
             if ui.button("Close").clicked() {
                 eprintln!("Pressed Close button");

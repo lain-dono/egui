@@ -50,18 +50,23 @@ impl super::Demo for ContextMenus {
         "☰ Context Menus"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         use super::View;
         egui::Window::new(self.name())
             .vscroll(false)
             .resizable(false)
             .open(open)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for ContextMenus {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.horizontal(|ui| {
             ui.menu_button("Click for menu", Self::nested_menus);
             ui.button("Right-click for menu")

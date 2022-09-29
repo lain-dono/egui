@@ -48,17 +48,17 @@ impl Demo for MiscDemoWindow {
         "✨ Misc Demos"
     }
 
-    fn show(&mut self, ctx: &Context, open: &mut bool) {
+    fn show(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager, open: &mut bool) {
         Window::new(self.name())
             .open(open)
             .vscroll(true)
             .hscroll(true)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl View for MiscDemoWindow {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.set_min_width(250.0);
 
         CollapsingHeader::new("Widgets")

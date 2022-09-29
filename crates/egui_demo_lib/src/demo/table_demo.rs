@@ -29,20 +29,25 @@ impl super::Demo for TableDemo {
         "☰ Table Demo"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(true)
             .default_width(400.0)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for TableDemo {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.vertical(|ui| {
             ui.checkbox(&mut self.resizable, "Resizable columns");
 

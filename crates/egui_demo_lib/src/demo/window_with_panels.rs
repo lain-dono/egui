@@ -7,19 +7,24 @@ impl super::Demo for WindowWithPanels {
         "🗖 Window With Panels"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         use super::View as _;
         let window = egui::Window::new("Window with Panels")
             .default_width(600.0)
             .default_height(400.0)
             .vscroll(false)
             .open(open);
-        window.show(ctx, |ui| self.ui(ui));
+        window.show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for WindowWithPanels {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         // Note that the order we add the panels is very important!
 
         egui::TopBottomPanel::top("top_panel")

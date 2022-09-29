@@ -19,19 +19,24 @@ impl super::Demo for TextEdit {
         "🖹 TextEdit"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(false)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for TextEdit {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         let Self { text } = self;
 
         ui.horizontal(|ui| {

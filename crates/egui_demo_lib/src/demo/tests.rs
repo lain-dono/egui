@@ -6,16 +6,21 @@ impl super::Demo for CursorTest {
         "Cursor Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name()).open(open).show(ctx, |ui| {
             use super::View as _;
-            self.ui(ui);
+            self.ui(ui, tex_manager);
         });
     }
 }
 
 impl super::View for CursorTest {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.vertical_centered_justified(|ui| {
             ui.heading("Hover to switch cursor icon:");
             for &cursor_icon in &egui::CursorIcon::ALL {
@@ -38,16 +43,21 @@ impl super::Demo for IdTest {
         "ID Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name()).open(open).show(ctx, |ui| {
             use super::View as _;
-            self.ui(ui);
+            self.ui(ui, tex_manager);
         });
     }
 }
 
 impl super::View for IdTest {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.heading("Name collision example");
 
         ui.label("\
@@ -115,19 +125,24 @@ impl super::Demo for ManualLayoutTest {
         "Manual Layout Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .resizable(false)
             .open(open)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for ManualLayoutTest {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         egui::reset_button(ui, self);
 
         let Self {
@@ -202,16 +217,21 @@ impl super::Demo for TableTest {
         "Table Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name()).open(open).show(ctx, |ui| {
             use super::View as _;
-            self.ui(ui);
+            self.ui(ui, tex_manager);
         });
     }
 }
 
 impl super::View for TableTest {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.add(
             egui::Slider::new(&mut self.min_col_width, 0.0..=400.0).text("Minimum column width"),
         );
@@ -314,19 +334,24 @@ impl super::Demo for InputTest {
         "Input Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(false)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for InputTest {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.vertical_centered(|ui| {
             ui.add(crate::egui_github_link_file!());
         });
@@ -392,7 +417,12 @@ impl super::Demo for WindowResizeTest {
         "↔ Window Resize"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         use egui::*;
 
         Window::new("↔ auto-sized")

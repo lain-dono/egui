@@ -74,18 +74,18 @@ impl super::Demo for Painting {
         "🖊 Painting"
     }
 
-    fn show(&mut self, ctx: &Context, open: &mut bool) {
+    fn show(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager, open: &mut bool) {
         use super::View as _;
         Window::new(self.name())
             .open(open)
             .default_size(vec2(512.0, 512.0))
             .vscroll(false)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for Painting {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.vertical_centered(|ui| {
             ui.add(crate::egui_github_link_file!());
         });

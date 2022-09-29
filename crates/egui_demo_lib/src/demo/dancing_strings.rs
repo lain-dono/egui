@@ -10,18 +10,18 @@ impl super::Demo for DancingStrings {
         "♫ Dancing Strings"
     }
 
-    fn show(&mut self, ctx: &Context, open: &mut bool) {
+    fn show(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager, open: &mut bool) {
         use super::View as _;
         Window::new(self.name())
             .open(open)
             .default_size(vec2(512.0, 256.0))
             .vscroll(false)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for DancingStrings {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         let color = if ui.visuals().dark_mode {
             Color32::from_additive_luminance(196)
         } else {

@@ -1,4 +1,6 @@
-use egui::{color::*, widgets::color_picker::show_color, TextureFilter, *};
+use egui::{
+    color::*, epaint::ArcTextureManager, widgets::color_picker::show_color, TextureFilter, *,
+};
 use std::collections::HashMap;
 
 const GRADIENT_SIZE: Vec2 = vec2(256.0, 24.0);
@@ -31,7 +33,7 @@ impl Default for ColorTest {
 }
 
 impl ColorTest {
-    pub fn ui(&mut self, ui: &mut Ui) {
+    pub fn ui(&mut self, ui: &mut Ui, tex_manager: &ArcTextureManager) {
         ui.set_max_width(680.0);
 
         ui.vertical_centered(|ui| {
@@ -51,7 +53,13 @@ impl ColorTest {
             ui.spacing_mut().item_spacing.y = 0.0; // No spacing between gradients
             let g = Gradient::one_color(Color32::from_rgb(255, 165, 0));
             self.vertex_gradient(ui, "orange rgb(255, 165, 0) - vertex", WHITE, &g);
-            self.tex_gradient(ui, "orange rgb(255, 165, 0) - texture", WHITE, &g);
+            self.tex_gradient(
+                ui,
+                "orange rgb(255, 165, 0) - texture",
+                WHITE,
+                &g,
+                tex_manager,
+            );
         });
 
         ui.separator();
@@ -74,7 +82,7 @@ impl ColorTest {
             {
                 let g = Gradient::one_color(Color32::from(tex_color * vertex_color));
                 self.vertex_gradient(ui, "Ground truth (vertices)", WHITE, &g);
-                self.tex_gradient(ui, "Ground truth (texture)", WHITE, &g);
+                self.tex_gradient(ui, "Ground truth (texture)", WHITE, &g, tex_manager);
             }
 
             ui.horizontal(|ui| {
@@ -83,7 +91,7 @@ impl ColorTest {
                 let tex = self
                     .textures
                     .entry(gradient.clone())
-                    .or_insert_with(|| create_texture(ui.ctx(), &gradient));
+                    .or_insert_with(|| create_texture(ui.ctx(), tex_manager, &gradient));
 
                 let texel_offset = 0.5 / (gradient.0.len() as f32);
                 let uv = Rect::from_min_max(pos2(texel_offset, 0.0), pos2(1.0 - texel_offset, 1.0));
@@ -101,18 +109,18 @@ impl ColorTest {
         // TODO(emilk): test color multiplication (image tint),
         // to make sure vertex and texture color multiplication is done in linear space.
 
-        self.show_gradients(ui, WHITE, (RED, GREEN));
+        self.show_gradients(ui, WHITE, (RED, GREEN), tex_manager);
         if self.srgb {
             ui.label("Notice the darkening in the center of the naive sRGB interpolation.");
         }
 
         ui.separator();
 
-        self.show_gradients(ui, RED, (TRANSPARENT, GREEN));
+        self.show_gradients(ui, RED, (TRANSPARENT, GREEN), tex_manager);
 
         ui.separator();
 
-        self.show_gradients(ui, WHITE, (TRANSPARENT, GREEN));
+        self.show_gradients(ui, WHITE, (TRANSPARENT, GREEN), tex_manager);
         if self.srgb {
             ui.label(
             "Notice how the linear blend stays green while the naive sRGBA interpolation looks gray in the middle.",
@@ -121,11 +129,11 @@ impl ColorTest {
 
         ui.separator();
 
-        self.show_gradients(ui, BLACK, (BLACK, WHITE));
+        self.show_gradients(ui, BLACK, (BLACK, WHITE), tex_manager);
         ui.separator();
-        self.show_gradients(ui, WHITE, (BLACK, TRANSPARENT));
+        self.show_gradients(ui, WHITE, (BLACK, TRANSPARENT), tex_manager);
         ui.separator();
-        self.show_gradients(ui, BLACK, (TRANSPARENT, WHITE));
+        self.show_gradients(ui, BLACK, (TRANSPARENT, WHITE), tex_manager);
         ui.separator();
 
         ui.label("Additive blending: add more and more blue to the red background:");
@@ -133,6 +141,7 @@ impl ColorTest {
             ui,
             RED,
             (TRANSPARENT, Color32::from_rgb_additive(0, 0, 255)),
+            tex_manager,
         );
 
         ui.separator();
@@ -144,7 +153,13 @@ impl ColorTest {
         blending_and_feathering_test(ui);
     }
 
-    fn show_gradients(&mut self, ui: &mut Ui, bg_fill: Color32, (left, right): (Color32, Color32)) {
+    fn show_gradients(
+        &mut self,
+        ui: &mut Ui,
+        bg_fill: Color32,
+        (left, right): (Color32, Color32),
+        tex_manager: &ArcTextureManager,
+    ) {
         let is_opaque = left.is_opaque() && right.is_opaque();
 
         ui.horizontal(|ui| {
@@ -164,7 +179,13 @@ impl ColorTest {
             if is_opaque {
                 let g = Gradient::ground_truth_linear_gradient(left, right);
                 self.vertex_gradient(ui, "Ground Truth (CPU gradient) - vertices", bg_fill, &g);
-                self.tex_gradient(ui, "Ground Truth (CPU gradient) - texture", bg_fill, &g);
+                self.tex_gradient(
+                    ui,
+                    "Ground Truth (CPU gradient) - texture",
+                    bg_fill,
+                    &g,
+                    tex_manager,
+                );
             } else {
                 let g = Gradient::ground_truth_linear_gradient(left, right).with_bg_fill(bg_fill);
                 self.vertex_gradient(
@@ -178,10 +199,17 @@ impl ColorTest {
                     "Ground Truth (CPU gradient, CPU blending) - texture",
                     bg_fill,
                     &g,
+                    tex_manager,
                 );
                 let g = Gradient::ground_truth_linear_gradient(left, right);
                 self.vertex_gradient(ui, "CPU gradient, GPU blending - vertices", bg_fill, &g);
-                self.tex_gradient(ui, "CPU gradient, GPU blending - texture", bg_fill, &g);
+                self.tex_gradient(
+                    ui,
+                    "CPU gradient, GPU blending - texture",
+                    bg_fill,
+                    &g,
+                    tex_manager,
+                );
             }
 
             let g = Gradient::texture_gradient(left, right);
@@ -191,7 +219,13 @@ impl ColorTest {
                 bg_fill,
                 &g,
             );
-            self.tex_gradient(ui, "Texture of width 2 (test texture sampler)", bg_fill, &g);
+            self.tex_gradient(
+                ui,
+                "Texture of width 2 (test texture sampler)",
+                bg_fill,
+                &g,
+                tex_manager,
+            );
 
             if self.srgb {
                 let g =
@@ -202,12 +236,25 @@ impl ColorTest {
                     bg_fill,
                     &g,
                 );
-                self.tex_gradient(ui, "Naive sRGBA interpolation (WRONG)", bg_fill, &g);
+                self.tex_gradient(
+                    ui,
+                    "Naive sRGBA interpolation (WRONG)",
+                    bg_fill,
+                    &g,
+                    tex_manager,
+                );
             }
         });
     }
 
-    fn tex_gradient(&mut self, ui: &mut Ui, label: &str, bg_fill: Color32, gradient: &Gradient) {
+    fn tex_gradient(
+        &mut self,
+        ui: &mut Ui,
+        label: &str,
+        bg_fill: Color32,
+        gradient: &Gradient,
+        tex_manager: &ArcTextureManager,
+    ) {
         if !self.texture_gradients {
             return;
         }
@@ -215,7 +262,7 @@ impl ColorTest {
             let tex = self
                 .textures
                 .entry(gradient.clone())
-                .or_insert_with(|| create_texture(ui.ctx(), gradient));
+                .or_insert_with(|| create_texture(ui.ctx(), tex_manager, gradient));
 
             let texel_offset = 0.5 / (gradient.0.len() as f32);
             let uv = Rect::from_min_max(pos2(texel_offset, 0.0), pos2(1.0 - texel_offset, 1.0));
@@ -334,10 +381,15 @@ impl Gradient {
     }
 }
 
-fn create_texture(ctx: &egui::Context, gradient: &Gradient) -> TextureHandle {
+fn create_texture(
+    ctx: &egui::Context,
+    tex_manager: &ArcTextureManager,
+    gradient: &Gradient,
+) -> TextureHandle {
     let pixels = gradient.to_pixel_row();
     let size = [pixels.len(), 1];
     ctx.load_texture(
+        tex_manager.clone(),
         "color_test_gradient",
         epaint::ColorImage { size, pixels },
         TextureFilter::Linear,

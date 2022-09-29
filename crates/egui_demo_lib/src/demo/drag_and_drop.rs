@@ -103,19 +103,19 @@ impl super::Demo for DragAndDropDemo {
         "✋ Drag and Drop"
     }
 
-    fn show(&mut self, ctx: &Context, open: &mut bool) {
+    fn show(&mut self, ctx: &Context, tex_manager: &egui::ArcTextureManager, open: &mut bool) {
         use super::View as _;
         Window::new(self.name())
             .open(open)
             .default_size(vec2(256.0, 256.0))
             .vscroll(false)
             .resizable(false)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for DragAndDropDemo {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.label("This is a proof-of-concept of drag-and-drop in egui.");
         ui.label("Drag items between columns.");
 

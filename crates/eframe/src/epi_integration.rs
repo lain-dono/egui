@@ -1,4 +1,5 @@
 use crate::{epi, Theme, WindowInfo};
+use egui::epaint::ArcTextureManager;
 use egui_winit::{native_pixels_per_point, WindowSettings};
 use winit::event_loop::EventLoopWindowTarget;
 
@@ -186,6 +187,8 @@ pub struct EpiIntegration {
     /// When set, it is time to close the native window.
     close: bool,
     can_drag_window: bool,
+
+    tex_manager: ArcTextureManager,
 }
 
 impl EpiIntegration {
@@ -226,6 +229,7 @@ impl EpiIntegration {
             pending_full_output: Default::default(),
             close: false,
             can_drag_window: false,
+            tex_manager: egui::context::default_texture_manager(),
         }
     }
 
@@ -270,9 +274,9 @@ impl EpiIntegration {
 
         self.frame.info.window_info = read_window_info(window, self.egui_ctx.pixels_per_point());
         let raw_input = self.egui_winit.take_egui_input(window);
-        let full_output = self.egui_ctx.run(raw_input, |egui_ctx| {
+        let full_output = self.egui_ctx.run(raw_input, &self.tex_manager, |egui_ctx| {
             crate::profile_scope!("App::update");
-            app.update(egui_ctx, &mut self.frame);
+            app.update(egui_ctx, &self.tex_manager, &mut self.frame);
         });
         self.pending_full_output.append(full_output);
         let full_output = std::mem::take(&mut self.pending_full_output);

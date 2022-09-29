@@ -97,8 +97,8 @@ impl BackendPanel {
         }
     }
 
-    pub fn end_of_frame(&mut self, ctx: &egui::Context) {
-        self.egui_windows.windows(ctx);
+    pub fn end_of_frame(&mut self, ctx: &egui::Context, tex_manager: &egui::ArcTextureManager) {
+        self.egui_windows.windows(ctx, tex_manager);
     }
 
     pub fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
@@ -323,7 +323,7 @@ impl EguiWindows {
         ui.checkbox(output_events, "📤 Output Events");
     }
 
-    fn windows(&mut self, ctx: &egui::Context) {
+    fn windows(&mut self, ctx: &egui::Context, tex_manager: &egui::ArcTextureManager) {
         let Self {
             settings,
             inspection,
@@ -350,7 +350,7 @@ impl EguiWindows {
             .open(inspection)
             .vscroll(true)
             .show(ctx, |ui| {
-                ctx.inspection_ui(ui);
+                ctx.inspection_ui(ui, tex_manager);
             });
 
         egui::Window::new("📝 Memory")

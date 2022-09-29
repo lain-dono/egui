@@ -96,7 +96,12 @@ impl Custom3d {
 }
 
 impl eframe::App for Custom3d {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default().show(ctx, |ui| {
             egui::ScrollArea::both()
                 .auto_shrink([false; 2])

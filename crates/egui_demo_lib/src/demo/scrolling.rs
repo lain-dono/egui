@@ -29,19 +29,24 @@ impl super::Demo for Scrolling {
         "↕ Scrolling"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(false)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for Scrolling {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, tex_manager: &egui::ArcTextureManager) {
         ui.horizontal(|ui| {
             ui.selectable_value(&mut self.demo, ScrollDemo::ScrollTo, "Scroll to");
             ui.selectable_value(
@@ -59,7 +64,7 @@ impl super::View for Scrolling {
         ui.separator();
         match self.demo {
             ScrollDemo::ScrollTo => {
-                self.scroll_to.ui(ui);
+                self.scroll_to.ui(ui, tex_manager);
             }
             ScrollDemo::ManyLines => {
                 huge_content_lines(ui);
@@ -68,7 +73,7 @@ impl super::View for Scrolling {
                 huge_content_painter(ui);
             }
             ScrollDemo::StickToEnd => {
-                self.scroll_stick_to.ui(ui);
+                self.scroll_stick_to.ui(ui, tex_manager);
             }
         }
     }
@@ -162,7 +167,7 @@ impl Default for ScrollTo {
 }
 
 impl super::View for ScrollTo {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.label("This shows how you can scroll to a specific item or pixel offset");
 
         let mut track_item = false;
@@ -264,7 +269,7 @@ struct ScrollStickTo {
 }
 
 impl super::View for ScrollStickTo {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.label("Rows enter from the bottom, we want the scroll handle to start and stay at bottom unless moved");
 
         ui.add_space(4.0);

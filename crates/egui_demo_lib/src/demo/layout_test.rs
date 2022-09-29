@@ -78,19 +78,24 @@ impl super::Demo for LayoutTest {
         "Layout Test"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(false)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for LayoutTest {
-    fn ui(&mut self, ui: &mut Ui) {
+    fn ui(&mut self, ui: &mut Ui, _tex_manager: &egui::ArcTextureManager) {
         ui.label("Tests and demonstrates the limits of the egui layouts");
         self.content_ui(ui);
         Resize::default()

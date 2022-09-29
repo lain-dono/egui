@@ -36,7 +36,12 @@ impl super::Demo for WindowOptions {
         "🗖 Window Options"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         let Self {
             title,
             title_bar,
@@ -69,12 +74,12 @@ impl super::Demo for WindowOptions {
         if anchored {
             window = window.anchor(anchor, anchor_offset);
         }
-        window.show(ctx, |ui| self.ui(ui));
+        window.show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for WindowOptions {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         let Self {
             title,
             title_bar,

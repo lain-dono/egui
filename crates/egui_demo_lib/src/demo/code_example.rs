@@ -68,19 +68,24 @@ impl super::Demo for CodeExample {
         "🖮 Code Example"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         use super::View;
         egui::Window::new(self.name())
             .open(open)
             .default_size([800.0, 400.0])
             .vscroll(false)
             .hscroll(true)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for CodeExample {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         use crate::syntax_highlighting::code_view_ui;
 
         ui.vertical_centered(|ui| {

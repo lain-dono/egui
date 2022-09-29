@@ -1,8 +1,5 @@
-use std::sync::Arc;
-
 use crate::{
-    emath::NumExt, mutex::RwLock, textures::TextureFilter, ImageData, ImageDelta, TextureId,
-    TextureManager,
+    emath::NumExt, textures::TextureFilter, ArcTextureManager, ImageData, ImageDelta, TextureId,
 };
 
 /// Used to paint images.
@@ -18,21 +15,21 @@ use crate::{
 /// See also [`TextureManager`].
 #[must_use]
 pub struct TextureHandle {
-    tex_mngr: Arc<RwLock<TextureManager>>,
+    tex_manager: ArcTextureManager,
     id: TextureId,
 }
 
 impl Drop for TextureHandle {
     fn drop(&mut self) {
-        self.tex_mngr.write().free(self.id);
+        self.tex_manager.write().free(self.id);
     }
 }
 
 impl Clone for TextureHandle {
     fn clone(&self) -> Self {
-        self.tex_mngr.write().retain(self.id);
+        self.tex_manager.write().retain(self.id);
         Self {
-            tex_mngr: self.tex_mngr.clone(),
+            tex_manager: self.tex_manager.clone(),
             id: self.id,
         }
     }
@@ -56,8 +53,8 @@ impl std::hash::Hash for TextureHandle {
 
 impl TextureHandle {
     /// If you are using egui, use `egui::Context::load_texture` instead.
-    pub fn new(tex_mngr: Arc<RwLock<TextureManager>>, id: TextureId) -> Self {
-        Self { tex_mngr, id }
+    pub fn new(tex_manager: ArcTextureManager, id: TextureId) -> Self {
+        Self { tex_manager, id }
     }
 
     #[inline]
@@ -67,7 +64,7 @@ impl TextureHandle {
 
     /// Assign a new image to an existing texture.
     pub fn set(&mut self, image: impl Into<ImageData>, filter: TextureFilter) {
-        self.tex_mngr
+        self.tex_manager
             .write()
             .set(self.id, ImageDelta::full(image.into(), filter));
     }
@@ -79,14 +76,14 @@ impl TextureHandle {
         image: impl Into<ImageData>,
         filter: TextureFilter,
     ) {
-        self.tex_mngr
+        self.tex_manager
             .write()
             .set(self.id, ImageDelta::partial(pos, image.into(), filter));
     }
 
     /// width x height
     pub fn size(&self) -> [usize; 2] {
-        self.tex_mngr.read().meta(self.id).unwrap().size
+        self.tex_manager.read().meta(self.id).unwrap().size
     }
 
     /// width x height
@@ -103,7 +100,7 @@ impl TextureHandle {
 
     /// Debug-name.
     pub fn name(&self) -> String {
-        self.tex_mngr.read().meta(self.id).unwrap().name.clone()
+        self.tex_manager.read().meta(self.id).unwrap().name.clone()
     }
 }
 

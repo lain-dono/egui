@@ -26,17 +26,22 @@ impl super::Demo for CodeEditor {
         "🖮 Code Editor"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         use super::View as _;
         egui::Window::new(self.name())
             .open(open)
             .default_height(500.0)
-            .show(ctx, |ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui, tex_manager));
     }
 }
 
 impl super::View for CodeEditor {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         let Self { language, code } = self;
 
         ui.horizontal(|ui| {

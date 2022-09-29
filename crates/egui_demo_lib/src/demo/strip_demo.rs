@@ -11,20 +11,25 @@ impl super::Demo for StripDemo {
         "▣ Strip Demo"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(true)
             .default_width(400.0)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for StripDemo {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, _tex_manager: &egui::ArcTextureManager) {
         let dark_mode = ui.visuals().dark_mode;
         let faded_color = ui.visuals().window_fill();
         let faded_color = |color: Color32| -> Color32 {

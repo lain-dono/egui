@@ -20,7 +20,12 @@ struct MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         let promise = self.promise.get_or_insert_with(|| {
             // Begin download.
             // We download the image using `ehttp`, a library that works both in WASM and on native.
@@ -44,7 +49,7 @@ impl eframe::App for MyApp {
                 ui.colored_label(ui.visuals().error_fg_color, err); // something went wrong
             }
             Some(Ok(image)) => {
-                image.show_max_size(ui, ui.available_size());
+                image.show_max_size(ui, tex_manager, ui.available_size());
             }
         });
     }

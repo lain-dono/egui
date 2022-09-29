@@ -7,7 +7,12 @@ struct EasyMarkApp {
 }
 
 impl eframe::App for EasyMarkApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         self.editor.panels(ctx);
     }
 }
@@ -21,8 +26,13 @@ pub struct DemoApp {
 }
 
 impl eframe::App for DemoApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.demo_windows.ui(ctx);
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
+        self.demo_windows.ui(ctx, tex_manager);
     }
 }
 
@@ -35,7 +45,12 @@ pub struct FractalClockApp {
 }
 
 impl eframe::App for FractalClockApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &egui::ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default()
             .frame(egui::Frame::dark_canvas(&ctx.style()))
             .show(ctx, |ui| {
@@ -54,7 +69,12 @@ pub struct ColorTestApp {
 }
 
 impl eframe::App for ColorTestApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default().show(ctx, |ui| {
             if frame.is_web() {
                 ui.label(
@@ -63,7 +83,7 @@ impl eframe::App for ColorTestApp {
                 ui.separator();
             }
             egui::ScrollArea::both().auto_shrink([false; 2]).show(ui, |ui| {
-                self.color_test.ui(ui);
+                self.color_test.ui(ui, tex_manager);
             });
         });
     }
@@ -166,7 +186,12 @@ impl eframe::App for WrapApp {
         visuals.window_fill().into()
     }
 
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        frame: &mut eframe::Frame,
+    ) {
         #[cfg(target_arch = "wasm32")]
         if let Some(anchor) = frame.info().web_info.location.hash.strip_prefix('#') {
             self.state.selected_anchor = anchor.to_owned();
@@ -202,9 +227,9 @@ impl eframe::App for WrapApp {
                 });
         }
 
-        self.show_selected_app(ctx, frame);
+        self.show_selected_app(ctx, tex_manager, frame);
 
-        self.state.backend_panel.end_of_frame(ctx);
+        self.state.backend_panel.end_of_frame(ctx, tex_manager);
 
         self.ui_file_drag_and_drop(ctx);
     }
@@ -234,12 +259,17 @@ impl WrapApp {
         });
     }
 
-    fn show_selected_app(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn show_selected_app(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        frame: &mut eframe::Frame,
+    ) {
         let mut found_anchor = false;
         let selected_anchor = self.state.selected_anchor.clone();
         for (_name, anchor, app) in self.apps_iter_mut() {
             if anchor == selected_anchor || ctx.memory().everything_is_visible() {
-                app.update(ctx, frame);
+                app.update(ctx, tex_manager, frame);
                 found_anchor = true;
             }
         }

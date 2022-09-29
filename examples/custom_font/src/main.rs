@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use eframe::egui;
+use eframe::{egui, epaint::ArcTextureManager};
 
 fn main() {
     let options = eframe::NativeOptions::default();
@@ -56,7 +56,12 @@ impl MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(
+        &mut self,
+        ctx: &egui::Context,
+        _tex_manager: &ArcTextureManager,
+        _frame: &mut eframe::Frame,
+    ) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("egui using custom fonts");
             ui.text_edit_multiline(&mut self.text);

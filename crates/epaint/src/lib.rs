@@ -158,3 +158,5 @@ pub fn f64_hash<H: std::hash::Hasher>(state: &mut H, f: f64) {
         f.to_bits().hash(state);
     }
 }
+
+pub type ArcTextureManager = std::sync::Arc<crate::mutex::RwLock<TextureManager>>;

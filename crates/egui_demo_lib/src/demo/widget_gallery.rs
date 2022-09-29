@@ -49,20 +49,25 @@ impl super::Demo for WidgetGallery {
         "🗄 Widget Gallery"
     }
 
-    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+    fn show(
+        &mut self,
+        ctx: &egui::Context,
+        tex_manager: &egui::ArcTextureManager,
+        open: &mut bool,
+    ) {
         egui::Window::new(self.name())
             .open(open)
             .resizable(true)
             .default_width(280.0)
             .show(ctx, |ui| {
                 use super::View as _;
-                self.ui(ui);
+                self.ui(ui, tex_manager);
             });
     }
 }
 
 impl super::View for WidgetGallery {
-    fn ui(&mut self, ui: &mut egui::Ui) {
+    fn ui(&mut self, ui: &mut egui::Ui, tex_manager: &egui::ArcTextureManager) {
         ui.add_enabled_ui(self.enabled, |ui| {
             ui.set_visible(self.visible);
 
@@ -71,7 +76,7 @@ impl super::View for WidgetGallery {
                 .spacing([40.0, 4.0])
                 .striped(true)
                 .show(ui, |ui| {
-                    self.gallery_grid_contents(ui);
+                    self.gallery_grid_contents(ui, tex_manager);
                 });
         });
 
@@ -99,7 +104,7 @@ impl super::View for WidgetGallery {
 }
 
 impl WidgetGallery {
-    fn gallery_grid_contents(&mut self, ui: &mut egui::Ui) {
+    fn gallery_grid_contents(&mut self, ui: &mut egui::Ui, tex_manager: &egui::ArcTextureManager) {
         let Self {
             enabled: _,
             visible: _,
@@ -116,6 +121,7 @@ impl WidgetGallery {
 
         let texture: &egui::TextureHandle = texture.get_or_insert_with(|| {
             ui.ctx().load_texture(
+                tex_manager.clone(),
                 "example",
                 egui::ColorImage::example(),
                 egui::TextureFilter::Linear,

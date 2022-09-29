@@ -9,22 +9,18 @@ use epaint::{mutex::*, stats::*, text::Fonts, textures::TextureFilter, Tessellat
 
 // ----------------------------------------------------------------------------
 
-struct WrappedTextureManager(Arc<RwLock<epaint::TextureManager>>);
+pub fn default_texture_manager() -> epaint::ArcTextureManager {
+    let mut tex_manager = epaint::textures::TextureManager::default();
 
-impl Default for WrappedTextureManager {
-    fn default() -> Self {
-        let mut tex_mngr = epaint::textures::TextureManager::default();
+    // Will be filled in later
+    let font_id = tex_manager.alloc(
+        "egui_font_texture".into(),
+        epaint::FontImage::new([0, 0]).into(),
+        Default::default(),
+    );
+    assert_eq!(font_id, TextureId::default());
 
-        // Will be filled in later
-        let font_id = tex_mngr.alloc(
-            "egui_font_texture".into(),
-            epaint::FontImage::new([0, 0]).into(),
-            Default::default(),
-        );
-        assert_eq!(font_id, TextureId::default());
-
-        Self(Arc::new(RwLock::new(tex_mngr)))
-    }
+    Arc::new(RwLock::new(tex_manager))
 }
 
 // ----------------------------------------------------------------------------
@@ -34,8 +30,6 @@ struct ContextImpl {
     fonts: Option<Fonts>,
     memory: Memory,
     animation_manager: AnimationManager,
-    tex_manager: WrappedTextureManager,
-
     input: InputState,
 
     /// State that is collected during a frame and then cleared
@@ -199,10 +193,15 @@ impl Context {
     /// // handle full_output
     /// ```
     #[must_use]
-    pub fn run(&self, new_input: RawInput, run_ui: impl FnOnce(&Context)) -> FullOutput {
+    pub fn run(
+        &self,
+        new_input: RawInput,
+        tex_manager: &RwLock<TextureManager>,
+        run_ui: impl FnOnce(&Context),
+    ) -> FullOutput {
         self.begin_frame(new_input);
         run_ui(self);
-        self.end_frame()
+        self.end_frame(tex_manager)
     }
 
     /// An alternative to calling [`Self::run`].
@@ -746,6 +745,7 @@ impl Context {
     /// Se also [`crate::ImageData`], [`crate::Ui::image`] and [`crate::ImageButton`].
     pub fn load_texture(
         &self,
+        tex_manager: Arc<RwLock<TextureManager>>,
         name: impl Into<String>,
         image: impl Into<ImageData>,
         filter: TextureFilter,
@@ -761,18 +761,8 @@ impl Context {
             image.height(),
             max_texture_side
         );
-        let tex_mngr = self.tex_manager();
-        let tex_id = tex_mngr.write().alloc(name, image, filter);
-        TextureHandle::new(tex_mngr, tex_id)
-    }
-
-    /// Low-level texture manager.
-    ///
-    /// In general it is easier to use [`Self::load_texture`] and [`TextureHandle`].
-    ///
-    /// You can show stats about the allocated textures using [`Self::texture_ui`].
-    pub fn tex_manager(&self) -> Arc<RwLock<epaint::textures::TextureManager>> {
-        self.read().tex_manager.0.clone()
+        let tex_id = tex_manager.write().alloc(name, image, filter);
+        TextureHandle::new(tex_manager, tex_id)
     }
 
     // ---------------------------------------------------------------------
@@ -815,7 +805,7 @@ impl Context {
 impl Context {
     /// Call at the end of each frame.
     #[must_use]
-    pub fn end_frame(&self) -> FullOutput {
+    pub fn end_frame(&self, tex_manager: &RwLock<TextureManager>) -> FullOutput {
         if self.input().wants_repaint() {
             self.request_repaint();
         }
@@ -829,14 +819,12 @@ impl Context {
 
             let font_image_delta = ctx_impl.fonts.as_ref().unwrap().font_image_delta();
             if let Some(font_image_delta) = font_image_delta {
-                ctx_impl
-                    .tex_manager
-                    .0
+                tex_manager
                     .write()
                     .set(TextureId::default(), font_image_delta);
             }
 
-            textures_delta = ctx_impl.tex_manager.0.write().take_delta();
+            textures_delta = tex_manager.write().take_delta();
         };
 
         let platform_output: PlatformOutput = std::mem::take(&mut self.output());
@@ -1107,7 +1095,7 @@ impl Context {
             });
     }
 
-    pub fn inspection_ui(&self, ui: &mut Ui) {
+    pub fn inspection_ui(&self, ui: &mut Ui, tex_manager: &RwLock<TextureManager>) {
         use crate::containers::*;
         crate::trace!(ui);
 
@@ -1171,7 +1159,7 @@ impl Context {
         CollapsingHeader::new("🖼 Textures")
             .default_open(false)
             .show(ui, |ui| {
-                self.texture_ui(ui);
+                self.texture_ui(ui, tex_manager);
             });
 
         CollapsingHeader::new("🔠 Font texture")
@@ -1183,11 +1171,10 @@ impl Context {
     }
 
     /// Show stats about the allocated textures.
-    pub fn texture_ui(&self, ui: &mut crate::Ui) {
-        let tex_mngr = self.tex_manager();
-        let tex_mngr = tex_mngr.read();
+    pub fn texture_ui(&self, ui: &mut crate::Ui, tex_manager: &RwLock<TextureManager>) {
+        let tex_manager = tex_manager.read();
 
-        let mut textures: Vec<_> = tex_mngr.allocated().collect();
+        let mut textures: Vec<_> = tex_manager.allocated().collect();
         textures.sort_by_key(|(id, _)| *id);
 
         let mut bytes = 0;

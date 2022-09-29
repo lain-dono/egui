@@ -9,12 +9,13 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     {
         let ctx = egui::Context::default();
         let mut demo_windows = egui_demo_lib::DemoWindows::default();
+        let tex_manager = egui::context::default_texture_manager();
 
         // The most end-to-end benchmark.
         c.bench_function("demo_with_tessellate__realistic", |b| {
             b.iter(|| {
-                let full_output = ctx.run(RawInput::default(), |ctx| {
-                    demo_windows.ui(ctx);
+                let full_output = ctx.run(RawInput::default(), &tex_manager, |ctx| {
+                    demo_windows.ui(ctx, &tex_manager);
                 });
                 ctx.tessellate(full_output.shapes)
             });
@@ -22,14 +23,14 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
         c.bench_function("demo_no_tessellate", |b| {
             b.iter(|| {
-                ctx.run(RawInput::default(), |ctx| {
-                    demo_windows.ui(ctx);
+                ctx.run(RawInput::default(), &tex_manager, |ctx| {
+                    demo_windows.ui(ctx, &tex_manager);
                 })
             });
         });
 
-        let full_output = ctx.run(RawInput::default(), |ctx| {
-            demo_windows.ui(ctx);
+        let full_output = ctx.run(RawInput::default(), &tex_manager, |ctx| {
+            demo_windows.ui(ctx, &tex_manager);
         });
         c.bench_function("demo_only_tessellate", |b| {
             b.iter(|| ctx.tessellate(full_output.shapes.clone()));
@@ -37,21 +38,23 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     }
 
     if false {
+        let tex_manager = egui::context::default_texture_manager();
         let ctx = egui::Context::default();
         ctx.memory().set_everything_is_visible(true); // give us everything
         let mut demo_windows = egui_demo_lib::DemoWindows::default();
         c.bench_function("demo_full_no_tessellate", |b| {
             b.iter(|| {
-                ctx.run(RawInput::default(), |ctx| {
-                    demo_windows.ui(ctx);
+                ctx.run(RawInput::default(), &tex_manager, |ctx| {
+                    demo_windows.ui(ctx, &tex_manager);
                 })
             });
         });
     }
 
     {
+        let tex_manager = egui::context::default_texture_manager();
         let ctx = egui::Context::default();
-        let _ = ctx.run(RawInput::default(), |ctx| {
+        let _ = ctx.run(RawInput::default(), &tex_manager, |ctx| {
             egui::CentralPanel::default().show(ctx, |ui| {
                 c.bench_function("label &str", |b| {
                     b.iter(|| {
@@ -68,6 +71,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
+        let tex_manager = egui::context::default_texture_manager();
         let ctx = egui::Context::default();
         ctx.begin_frame(RawInput::default());
 
