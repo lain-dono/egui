@@ -533,7 +533,7 @@ pub enum WidgetType {
 /// For use in tests; especially doctests.
 pub fn __run_test_ctx(mut run_ui: impl FnMut(&Context)) {
     let ctx = Context::default();
-    let tex_manager = crate::context::default_texture_manager();
+    let tex_manager = epaint::default_texture_manager();
     ctx.set_fonts(FontDefinitions::empty()); // prevent fonts from being loaded (save CPU time)
     let _ = ctx.run(Default::default(), &tex_manager, |ctx| {
         run_ui(ctx);
@@ -543,7 +543,7 @@ pub fn __run_test_ctx(mut run_ui: impl FnMut(&Context)) {
 /// For use in tests; especially doctests.
 pub fn __run_test_ui(mut add_contents: impl FnMut(&mut Ui)) {
     let ctx = Context::default();
-    let tex_manager = crate::context::default_texture_manager();
+    let tex_manager = epaint::default_texture_manager();
     ctx.set_fonts(FontDefinitions::empty()); // prevent fonts from being loaded (save CPU time)
     let _ = ctx.run(Default::default(), &tex_manager, |ctx| {
         crate::CentralPanel::default().show(ctx, |ui| {

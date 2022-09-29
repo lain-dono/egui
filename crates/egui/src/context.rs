@@ -9,20 +9,6 @@ use epaint::{mutex::*, stats::*, text::Fonts, textures::TextureFilter, Tessellat
 
 // ----------------------------------------------------------------------------
 
-pub fn default_texture_manager() -> epaint::ArcTextureManager {
-    let mut tex_manager = epaint::textures::TextureManager::default();
-
-    // Will be filled in later
-    let font_id = tex_manager.alloc(
-        "egui_font_texture".into(),
-        epaint::FontImage::new([0, 0]).into(),
-        Default::default(),
-    );
-    assert_eq!(font_id, TextureId::default());
-
-    Arc::new(RwLock::new(tex_manager))
-}
-
 // ----------------------------------------------------------------------------
 #[derive(Default)]
 struct ContextImpl {

@@ -160,3 +160,17 @@ pub fn f64_hash<H: std::hash::Hasher>(state: &mut H, f: f64) {
 }
 
 pub type ArcTextureManager = std::sync::Arc<crate::mutex::RwLock<TextureManager>>;
+
+pub fn default_texture_manager() -> ArcTextureManager {
+    let mut tex_manager = TextureManager::default();
+
+    // Will be filled in later
+    let font_id = tex_manager.alloc(
+        "egui_font_texture".into(),
+        FontImage::new([0, 0]).into(),
+        Default::default(),
+    );
+    assert_eq!(font_id, TextureId::default());
+
+    std::sync::Arc::new(mutex::RwLock::new(tex_manager))
+}

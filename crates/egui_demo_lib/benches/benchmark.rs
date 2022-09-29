@@ -9,7 +9,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     {
         let ctx = egui::Context::default();
         let mut demo_windows = egui_demo_lib::DemoWindows::default();
-        let tex_manager = egui::context::default_texture_manager();
+        let tex_manager = egui::epaint::default_texture_manager();
 
         // The most end-to-end benchmark.
         c.bench_function("demo_with_tessellate__realistic", |b| {
@@ -38,7 +38,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     }
 
     if false {
-        let tex_manager = egui::context::default_texture_manager();
+        let tex_manager = egui::epaint::default_texture_manager();
         let ctx = egui::Context::default();
         ctx.memory().set_everything_is_visible(true); // give us everything
         let mut demo_windows = egui_demo_lib::DemoWindows::default();
@@ -52,7 +52,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
-        let tex_manager = egui::context::default_texture_manager();
+        let tex_manager = egui::epaint::default_texture_manager();
         let ctx = egui::Context::default();
         let _ = ctx.run(RawInput::default(), &tex_manager, |ctx| {
             egui::CentralPanel::default().show(ctx, |ui| {
@@ -71,7 +71,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
-        let tex_manager = egui::context::default_texture_manager();
+        let tex_manager = egui::epaint::default_texture_manager();
         let ctx = egui::Context::default();
         ctx.begin_frame(RawInput::default());
 
