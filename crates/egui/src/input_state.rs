@@ -386,7 +386,7 @@ impl InputState {
 
 /// A pointer (mouse or touch) click.
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct Click {
+pub struct Click {
     pub pos: Pos2,
     pub button: PointerButton,
     /// 1 or 2 (double-click) or 3 (triple-click)
@@ -406,7 +406,7 @@ impl Click {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) enum PointerEvent {
+pub enum PointerEvent {
     Moved(Pos2),
     Pressed {
         position: Pos2,
@@ -472,7 +472,7 @@ pub struct PointerState {
 
     /// Set to `true` if the pointer has moved too much (since being pressed)
     /// for it to be registered as a click.
-    pub(crate) has_moved_too_much_for_a_click: bool,
+    pub has_moved_too_much_for_a_click: bool,
 
     /// When did the pointer get click last?
     /// Used to check for double-clicks.
@@ -483,7 +483,7 @@ pub struct PointerState {
     last_last_click_time: f64,
 
     /// All button events that occurred this frame
-    pub(crate) pointer_events: Vec<PointerEvent>,
+    pub pointer_events: Vec<PointerEvent>,
 }
 
 impl Default for PointerState {
@@ -508,7 +508,7 @@ impl Default for PointerState {
 
 impl PointerState {
     #[must_use]
-    pub(crate) fn begin_frame(mut self, time: f64, new: &RawInput) -> PointerState {
+    pub fn begin_frame(mut self, time: f64, new: &RawInput) -> PointerState {
         self.time = time;
 
         self.pointer_events.clear();
@@ -662,7 +662,7 @@ impl PointerState {
     /// Latest reported pointer position.
     /// When tapping a touch screen, this will be `None`.
     #[inline(always)]
-    pub(crate) fn latest_pos(&self) -> Option<Pos2> {
+    pub fn latest_pos(&self) -> Option<Pos2> {
         self.latest_pos
     }
 
@@ -794,7 +794,7 @@ impl PointerState {
 
     /// If the pointer button is down, will it register as a click when released?
     #[inline(always)]
-    pub(crate) fn could_any_button_be_click(&self) -> bool {
+    pub fn could_any_button_be_click(&self) -> bool {
         if !self.any_down() {
             return false;
         }

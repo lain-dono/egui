@@ -287,7 +287,7 @@ impl Context {
 
     /// Use `ui.interact` instead
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn interact(
+    pub fn interact(
         &self,
         clip_rect: Rect,
         item_spacing: Vec2,
@@ -310,7 +310,7 @@ impl Context {
     }
 
     /// You specify if a thing is hovered, and the function gives a [`Response`].
-    pub(crate) fn interact_with_hovered(
+    pub fn interact_with_hovered(
         &self,
         layer_id: LayerId,
         id: Id,
@@ -480,7 +480,7 @@ impl Context {
     }
 
     #[inline]
-    pub(crate) fn graphics(&self) -> RwLockWriteGuard<'_, GraphicLayers> {
+    pub fn graphics(&self) -> RwLockWriteGuard<'_, GraphicLayers> {
         RwLockWriteGuard::map(self.write(), |c| &mut c.graphics)
     }
 
@@ -496,7 +496,7 @@ impl Context {
     }
 
     #[inline]
-    pub(crate) fn frame_state(&self) -> RwLockWriteGuard<'_, FrameState> {
+    pub fn frame_state(&self) -> RwLockWriteGuard<'_, FrameState> {
         RwLockWriteGuard::map(self.write(), |c| &mut c.frame_state)
     }
 
@@ -688,23 +688,23 @@ impl Context {
     }
 
     /// Useful for pixel-perfect rendering
-    pub(crate) fn round_to_pixel(&self, point: f32) -> f32 {
+    pub fn round_to_pixel(&self, point: f32) -> f32 {
         let pixels_per_point = self.pixels_per_point();
         (point * pixels_per_point).round() / pixels_per_point
     }
 
     /// Useful for pixel-perfect rendering
-    pub(crate) fn round_pos_to_pixels(&self, pos: Pos2) -> Pos2 {
+    pub fn round_pos_to_pixels(&self, pos: Pos2) -> Pos2 {
         pos2(self.round_to_pixel(pos.x), self.round_to_pixel(pos.y))
     }
 
     /// Useful for pixel-perfect rendering
-    pub(crate) fn round_vec_to_pixels(&self, vec: Vec2) -> Vec2 {
+    pub fn round_vec_to_pixels(&self, vec: Vec2) -> Vec2 {
         vec2(self.round_to_pixel(vec.x), self.round_to_pixel(vec.y))
     }
 
     /// Useful for pixel-perfect rendering
-    pub(crate) fn round_rect_to_pixels(&self, rect: Rect) -> Rect {
+    pub fn round_rect_to_pixels(&self, rect: Rect) -> Rect {
         Rect {
             min: self.round_pos_to_pixels(rect.min),
             max: self.round_pos_to_pixels(rect.max),
@@ -780,7 +780,7 @@ impl Context {
     /// Constrain the position of a window/area so it fits within the provided boundary.
     ///
     /// If area is `None`, will constrain to [`Self::available_rect`].
-    pub(crate) fn constrain_window_rect_to_area(&self, window: Rect, area: Option<Rect>) -> Rect {
+    pub fn constrain_window_rect_to_area(&self, window: Rect, area: Option<Rect>) -> Rect {
         let mut area = area.unwrap_or_else(|| self.available_rect());
 
         if window.width() > area.width() {
@@ -1008,7 +1008,7 @@ impl Context {
         self.memory().areas.move_to_top(layer_id);
     }
 
-    pub(crate) fn rect_contains_pointer(&self, layer_id: LayerId, rect: Rect) -> bool {
+    pub fn rect_contains_pointer(&self, layer_id: LayerId, rect: Rect) -> bool {
         let pointer_pos = self.input().pointer.interact_pos();
         if let Some(pointer_pos) = pointer_pos {
             rect.contains(pointer_pos) && self.layer_id_at(pointer_pos) == Some(layer_id)

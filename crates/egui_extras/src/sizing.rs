@@ -80,7 +80,7 @@ impl Size {
 
 #[derive(Clone, Default)]
 pub struct Sizing {
-    pub(crate) sizes: Vec<Size>,
+    pub sizes: Vec<Size>,
 }
 
 impl Sizing {

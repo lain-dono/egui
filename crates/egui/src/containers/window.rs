@@ -469,13 +469,13 @@ impl PossibleInteractions {
 
 /// Either a move or resize
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct WindowInteraction {
-    pub(crate) area_layer_id: LayerId,
-    pub(crate) start_rect: Rect,
-    pub(crate) left: bool,
-    pub(crate) right: bool,
-    pub(crate) top: bool,
-    pub(crate) bottom: bool,
+pub struct WindowInteraction {
+    pub area_layer_id: LayerId,
+    pub start_rect: Rect,
+    pub left: bool,
+    pub right: bool,
+    pub top: bool,
+    pub bottom: bool,
 }
 
 impl WindowInteraction {

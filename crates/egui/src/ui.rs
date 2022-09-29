@@ -444,7 +444,7 @@ impl Ui {
     }
 
     /// Used for animation, kind of hacky
-    pub(crate) fn force_set_min_rect(&mut self, min_rect: Rect) {
+    pub fn force_set_min_rect(&mut self, min_rect: Rect) {
         self.placer.force_set_min_rect(min_rect);
     }
 
@@ -586,11 +586,11 @@ impl Ui {
         self.id.with(&id_source)
     }
 
-    pub(crate) fn next_auto_id(&self) -> Id {
+    pub fn next_auto_id(&self) -> Id {
         Id::new(self.next_auto_id_source)
     }
 
-    pub(crate) fn auto_id_with<IdSource>(&self, id_source: IdSource) -> Id
+    pub fn auto_id_with<IdSource>(&self, id_source: IdSource) -> Id
     where
         IdSource: Hash + std::fmt::Debug,
     {
@@ -772,7 +772,7 @@ impl Ui {
         self.interact(rect, id, sense)
     }
 
-    pub(crate) fn advance_cursor_after_rect(&mut self, rect: Rect) -> Id {
+    pub fn advance_cursor_after_rect(&mut self, rect: Rect) -> Id {
         egui_assert!(!rect.any_nan());
         let item_spacing = self.spacing().item_spacing;
         self.placer.advance_after_rects(rect, rect, item_spacing);
@@ -788,7 +788,7 @@ impl Ui {
         id
     }
 
-    pub(crate) fn placer(&self) -> &Placer {
+    pub fn placer(&self) -> &Placer {
         &self.placer
     }
 
@@ -806,7 +806,7 @@ impl Ui {
         self.placer.cursor()
     }
 
-    pub(crate) fn set_cursor(&mut self, cursor: Rect) {
+    pub fn set_cursor(&mut self, cursor: Rect) {
         self.placer.set_cursor(cursor);
     }
 
@@ -2001,15 +2001,15 @@ impl Ui {
         )
     }
 
-    pub(crate) fn set_grid(&mut self, grid: grid::GridLayout) {
+    pub fn set_grid(&mut self, grid: grid::GridLayout) {
         self.placer.set_grid(grid);
     }
 
-    pub(crate) fn save_grid(&mut self) {
+    pub fn save_grid(&mut self) {
         self.placer.save_grid();
     }
 
-    pub(crate) fn is_grid(&self) -> bool {
+    pub fn is_grid(&self) -> bool {
         self.placer.is_grid()
     }
 
@@ -2096,11 +2096,11 @@ impl Ui {
         self.menu_state = None;
     }
 
-    pub(crate) fn menu_state(&self) -> Option<Arc<RwLock<MenuState>>> {
+    pub fn menu_state(&self) -> Option<Arc<RwLock<MenuState>>> {
         self.menu_state.clone()
     }
 
-    pub(crate) fn set_menu_state(&mut self, menu_state: Option<Arc<RwLock<MenuState>>>) {
+    pub fn set_menu_state(&mut self, menu_state: Option<Arc<RwLock<MenuState>>>) {
         self.menu_state = menu_state;
     }
 

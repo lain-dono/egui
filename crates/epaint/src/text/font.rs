@@ -33,7 +33,7 @@ impl UvRect {
 
 #[derive(Clone, Copy, Debug)]
 pub struct GlyphInfo {
-    pub(crate) id: ab_glyph::GlyphId,
+    pub id: ab_glyph::GlyphId,
 
     /// Unit: points.
     pub advance_width: f32,
@@ -323,7 +323,7 @@ impl Font {
     }
 
     #[inline]
-    pub(crate) fn glyph_info_and_font_impl(&mut self, c: char) -> (Option<&FontImpl>, GlyphInfo) {
+    pub fn glyph_info_and_font_impl(&mut self, c: char) -> (Option<&FontImpl>, GlyphInfo) {
         if self.fonts.is_empty() {
             return (None, self.replacement_glyph.1);
         }

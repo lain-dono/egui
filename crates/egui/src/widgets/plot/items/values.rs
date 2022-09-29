@@ -265,7 +265,7 @@ impl PlotPoints {
     }
 
     /// Returns true if there are no data points available and there is no function to generate any.
-    pub(crate) fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         match self {
             PlotPoints::Owned(points) => points.is_empty(),
             PlotPoints::Generator(_) => false,
@@ -355,7 +355,7 @@ impl MarkerShape {
 // ----------------------------------------------------------------------------
 
 /// Query the points of the plot, for geometric relations like closest checks
-pub(crate) enum PlotGeometry<'a> {
+pub enum PlotGeometry<'a> {
     /// No geometry based on single elements (examples: text, image, horizontal/vertical line)
     None,
 
@@ -423,7 +423,7 @@ impl ExplicitGenerator {
 // ----------------------------------------------------------------------------
 
 /// Result of [`super::PlotItem::find_closest()`] search, identifies an element inside the item for immediate use
-pub(crate) struct ClosestElem {
+pub struct ClosestElem {
     /// Position of hovered-over value (or bar/box-plot/...) in PlotItem
     pub index: usize,
 

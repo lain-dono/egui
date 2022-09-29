@@ -262,7 +262,7 @@ impl ScrollArea {
         self
     }
 
-    pub(crate) fn has_any_bar(&self) -> bool {
+    pub fn has_any_bar(&self) -> bool {
         self.has_bar[0] || self.has_bar[1]
     }
 

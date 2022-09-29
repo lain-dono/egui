@@ -39,7 +39,7 @@ impl Id {
         Self(0)
     }
 
-    pub(crate) fn background() -> Self {
+    pub fn background() -> Self {
         Self(1)
     }
 
@@ -66,7 +66,7 @@ impl Id {
     }
 
     #[inline(always)]
-    pub(crate) fn value(&self) -> u64 {
+    pub fn value(&self) -> u64 {
         self.0
     }
 }

@@ -1,6 +1,6 @@
 use crate::*;
 
-pub(crate) struct Placer {
+pub struct Placer {
     /// If set this will take precedence over [`layout`].
     grid: Option<grid::GridLayout>,
     layout: Layout,
@@ -8,7 +8,7 @@ pub(crate) struct Placer {
 }
 
 impl Placer {
-    pub(crate) fn new(max_rect: Rect, layout: Layout) -> Self {
+    pub fn new(max_rect: Rect, layout: Layout) -> Self {
         let region = layout.region_from_max_rect(max_rect);
         Self {
             grid: None,
@@ -18,64 +18,64 @@ impl Placer {
     }
 
     #[inline(always)]
-    pub(crate) fn set_grid(&mut self, grid: grid::GridLayout) {
+    pub fn set_grid(&mut self, grid: grid::GridLayout) {
         self.grid = Some(grid);
     }
 
-    pub(crate) fn save_grid(&mut self) {
+    pub fn save_grid(&mut self) {
         if let Some(grid) = &mut self.grid {
             grid.save();
         }
     }
 
     #[inline(always)]
-    pub(crate) fn grid(&self) -> Option<&grid::GridLayout> {
+    pub fn grid(&self) -> Option<&grid::GridLayout> {
         self.grid.as_ref()
     }
 
     #[inline(always)]
-    pub(crate) fn is_grid(&self) -> bool {
+    pub fn is_grid(&self) -> bool {
         self.grid.is_some()
     }
 
     #[inline(always)]
-    pub(crate) fn layout(&self) -> &Layout {
+    pub fn layout(&self) -> &Layout {
         &self.layout
     }
 
     #[inline(always)]
-    pub(crate) fn prefer_right_to_left(&self) -> bool {
+    pub fn prefer_right_to_left(&self) -> bool {
         self.layout.prefer_right_to_left()
     }
 
     #[inline(always)]
-    pub(crate) fn min_rect(&self) -> Rect {
+    pub fn min_rect(&self) -> Rect {
         self.region.min_rect
     }
 
     #[inline(always)]
-    pub(crate) fn max_rect(&self) -> Rect {
+    pub fn max_rect(&self) -> Rect {
         self.region.max_rect
     }
 
     #[inline(always)]
-    pub(crate) fn force_set_min_rect(&mut self, min_rect: Rect) {
+    pub fn force_set_min_rect(&mut self, min_rect: Rect) {
         self.region.min_rect = min_rect;
     }
 
     #[inline(always)]
-    pub(crate) fn cursor(&self) -> Rect {
+    pub fn cursor(&self) -> Rect {
         self.region.cursor
     }
 
     #[inline(always)]
-    pub(crate) fn set_cursor(&mut self, cursor: Rect) {
+    pub fn set_cursor(&mut self, cursor: Rect) {
         self.region.cursor = cursor;
     }
 }
 
 impl Placer {
-    pub(crate) fn align_size_within_rect(&self, size: Vec2, outer: Rect) -> Rect {
+    pub fn align_size_within_rect(&self, size: Vec2, outer: Rect) -> Rect {
         if let Some(grid) = &self.grid {
             grid.align_size_within_rect(size, outer)
         } else {
@@ -83,7 +83,7 @@ impl Placer {
         }
     }
 
-    pub(crate) fn available_rect_before_wrap(&self) -> Rect {
+    pub fn available_rect_before_wrap(&self) -> Rect {
         if let Some(grid) = &self.grid {
             grid.available_rect(&self.region)
         } else {
@@ -93,7 +93,7 @@ impl Placer {
 
     /// Amount of space available for a widget.
     /// For wrapping layouts, this is the maximum (after wrap).
-    pub(crate) fn available_size(&self) -> Vec2 {
+    pub fn available_size(&self) -> Vec2 {
         if let Some(grid) = &self.grid {
             grid.available_rect(&self.region).size()
         } else {
@@ -105,7 +105,7 @@ impl Placer {
     /// The returned `frame_rect` will always be justified along the cross axis.
     /// This is what you then pass to `advance_after_rects`.
     /// Use `justify_and_align` to get the inner `widget_rect`.
-    pub(crate) fn next_space(&self, child_size: Vec2, item_spacing: Vec2) -> Rect {
+    pub fn next_space(&self, child_size: Vec2, item_spacing: Vec2) -> Rect {
         egui_assert!(child_size.is_finite() && child_size.x >= 0.0 && child_size.y >= 0.0);
         self.region.sanity_check();
         if let Some(grid) = &self.grid {
@@ -117,7 +117,7 @@ impl Placer {
     }
 
     /// Where do we expect a zero-sized widget to be placed?
-    pub(crate) fn next_widget_position(&self) -> Pos2 {
+    pub fn next_widget_position(&self) -> Pos2 {
         if let Some(grid) = &self.grid {
             grid.next_cell(self.region.cursor, Vec2::ZERO).center()
         } else {
@@ -126,7 +126,7 @@ impl Placer {
     }
 
     /// Apply justify or alignment after calling `next_space`.
-    pub(crate) fn justify_and_align(&self, rect: Rect, child_size: Vec2) -> Rect {
+    pub fn justify_and_align(&self, rect: Rect, child_size: Vec2) -> Rect {
         crate::egui_assert!(!rect.any_nan());
         crate::egui_assert!(!child_size.any_nan());
 
@@ -139,7 +139,7 @@ impl Placer {
 
     /// Advance the cursor by this many points.
     /// [`Self::min_rect`] will expand to contain the cursor.
-    pub(crate) fn advance_cursor(&mut self, amount: f32) {
+    pub fn advance_cursor(&mut self, amount: f32) {
         crate::egui_assert!(
             self.grid.is_none(),
             "You cannot advance the cursor when in a grid layout"
@@ -152,12 +152,7 @@ impl Placer {
     ///
     /// * `frame_rect`: the frame inside which a widget was e.g. centered
     /// * `widget_rect`: the actual rect used by the widget
-    pub(crate) fn advance_after_rects(
-        &mut self,
-        frame_rect: Rect,
-        widget_rect: Rect,
-        item_spacing: Vec2,
-    ) {
+    pub fn advance_after_rects(&mut self, frame_rect: Rect, widget_rect: Rect, item_spacing: Vec2) {
         egui_assert!(!frame_rect.any_nan());
         egui_assert!(!widget_rect.any_nan());
         self.region.sanity_check();
@@ -180,7 +175,7 @@ impl Placer {
 
     /// Move to the next row in a grid layout or wrapping layout.
     /// Otherwise does nothing.
-    pub(crate) fn end_row(&mut self, item_spacing: Vec2, painter: &Painter) {
+    pub fn end_row(&mut self, item_spacing: Vec2, painter: &Painter) {
         if let Some(grid) = &mut self.grid {
             grid.end_row(&mut self.region.cursor, painter);
         } else {
@@ -189,24 +184,24 @@ impl Placer {
     }
 
     /// Set row height in horizontal wrapping layout.
-    pub(crate) fn set_row_height(&mut self, height: f32) {
+    pub fn set_row_height(&mut self, height: f32) {
         self.layout.set_row_height(&mut self.region, height);
     }
 }
 
 impl Placer {
     /// Expand the `min_rect` and `max_rect` of this ui to include a child at the given rect.
-    pub(crate) fn expand_to_include_rect(&mut self, rect: Rect) {
+    pub fn expand_to_include_rect(&mut self, rect: Rect) {
         self.region.expand_to_include_rect(rect);
     }
 
     /// Expand the `min_rect` and `max_rect` of this ui to include a child at the given x-coordinate.
-    pub(crate) fn expand_to_include_x(&mut self, x: f32) {
+    pub fn expand_to_include_x(&mut self, x: f32) {
         self.region.expand_to_include_x(x);
     }
 
     /// Expand the `min_rect` and `max_rect` of this ui to include a child at the given y-coordinate.
-    pub(crate) fn expand_to_include_y(&mut self, y: f32) {
+    pub fn expand_to_include_y(&mut self, y: f32) {
         self.region.expand_to_include_y(y);
     }
 
@@ -217,7 +212,7 @@ impl Placer {
 
     /// Set the maximum width of the ui.
     /// You won't be able to shrink it below the current minimum size.
-    pub(crate) fn set_max_width(&mut self, width: f32) {
+    pub fn set_max_width(&mut self, width: f32) {
         let rect = self.next_widget_space_ignore_wrap_justify(vec2(width, 0.0));
         let region = &mut self.region;
         region.max_rect.min.x = rect.min.x;
@@ -232,7 +227,7 @@ impl Placer {
 
     /// Set the maximum height of the ui.
     /// You won't be able to shrink it below the current minimum size.
-    pub(crate) fn set_max_height(&mut self, height: f32) {
+    pub fn set_max_height(&mut self, height: f32) {
         let rect = self.next_widget_space_ignore_wrap_justify(vec2(0.0, height));
         let region = &mut self.region;
         region.max_rect.min.y = rect.min.y;
@@ -247,7 +242,7 @@ impl Placer {
 
     /// Set the minimum width of the ui.
     /// This can't shrink the ui, only make it larger.
-    pub(crate) fn set_min_width(&mut self, width: f32) {
+    pub fn set_min_width(&mut self, width: f32) {
         let rect = self.next_widget_space_ignore_wrap_justify(vec2(width, 0.0));
         self.region.expand_to_include_x(rect.min.x);
         self.region.expand_to_include_x(rect.max.x);
@@ -255,7 +250,7 @@ impl Placer {
 
     /// Set the minimum height of the ui.
     /// This can't shrink the ui, only make it larger.
-    pub(crate) fn set_min_height(&mut self, height: f32) {
+    pub fn set_min_height(&mut self, height: f32) {
         let rect = self.next_widget_space_ignore_wrap_justify(vec2(0.0, height));
         self.region.expand_to_include_y(rect.min.y);
         self.region.expand_to_include_y(rect.max.y);
@@ -263,7 +258,7 @@ impl Placer {
 }
 
 impl Placer {
-    pub(crate) fn debug_paint_cursor(&self, painter: &crate::Painter, text: impl ToString) {
+    pub fn debug_paint_cursor(&self, painter: &crate::Painter, text: impl ToString) {
         let stroke = Stroke::new(1.0, Color32::DEBUG_COLOR);
 
         if let Some(grid) = &self.grid {

@@ -6,7 +6,7 @@ use crate::*;
 
 /// Same state for all tooltips.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct MonoState {
+pub struct MonoState {
     last_id: Option<Id>,
     last_size: Vec<Vec2>,
 }

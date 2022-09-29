@@ -1,7 +1,7 @@
 use crate::{emath::remap_clamp, Id, IdMap, InputState};
 
 #[derive(Clone, Default)]
-pub(crate) struct AnimationManager {
+pub struct AnimationManager {
     bools: IdMap<BoolAnim>,
     values: IdMap<ValueAnim>,
 }

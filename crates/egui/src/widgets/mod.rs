@@ -8,7 +8,7 @@ use crate::*;
 
 mod button;
 pub mod color_picker;
-pub(crate) mod drag_value;
+pub mod drag_value;
 mod hyperlink;
 mod image;
 mod label;
@@ -124,7 +124,7 @@ pub fn stroke_ui(ui: &mut crate::Ui, stroke: &mut epaint::Stroke, text: &str) {
     });
 }
 
-pub(crate) fn shadow_ui(ui: &mut Ui, shadow: &mut epaint::Shadow, text: &str) {
+pub fn shadow_ui(ui: &mut Ui, shadow: &mut epaint::Shadow, text: &str) {
     let epaint::Shadow { extrusion, color } = shadow;
     ui.horizontal(|ui| {
         ui.label(text);

@@ -1,7 +1,7 @@
 use crate::*;
 
 #[derive(Clone, Debug, Default, PartialEq)]
-pub(crate) struct State {
+pub struct State {
     col_widths: Vec<f32>,
     row_heights: Vec<f32>,
 }
@@ -46,7 +46,7 @@ impl State {
 
 // ----------------------------------------------------------------------------
 
-pub(crate) struct GridLayout {
+pub struct GridLayout {
     ctx: Context,
     style: std::sync::Arc<Style>,
     id: Id,
@@ -71,7 +71,7 @@ pub(crate) struct GridLayout {
 }
 
 impl GridLayout {
-    pub(crate) fn new(ui: &Ui, id: Id) -> Self {
+    pub fn new(ui: &Ui, id: Id) -> Self {
         let prev_state = State::load(ui.ctx(), id).unwrap_or_default();
 
         // TODO(emilk): respect current layout
@@ -117,11 +117,11 @@ impl GridLayout {
             .unwrap_or(self.min_cell_size.y)
     }
 
-    pub(crate) fn wrap_text(&self) -> bool {
+    pub fn wrap_text(&self) -> bool {
         self.max_cell_size.x.is_finite()
     }
 
-    pub(crate) fn available_rect(&self, region: &Region) -> Rect {
+    pub fn available_rect(&self, region: &Region) -> Rect {
         let is_last_column = Some(self.col + 1) == self.num_columns;
 
         let width = if is_last_column {
@@ -151,7 +151,7 @@ impl GridLayout {
         Rect::from_min_size(available.min, vec2(width, height))
     }
 
-    pub(crate) fn next_cell(&self, cursor: Rect, child_size: Vec2) -> Rect {
+    pub fn next_cell(&self, cursor: Rect, child_size: Vec2) -> Rect {
         let width = self.prev_state.col_width(self.col).unwrap_or(0.0);
         let height = self.prev_row_height(self.row);
         let size = child_size.max(vec2(width, height));
@@ -159,16 +159,16 @@ impl GridLayout {
     }
 
     #[allow(clippy::unused_self)]
-    pub(crate) fn align_size_within_rect(&self, size: Vec2, frame: Rect) -> Rect {
+    pub fn align_size_within_rect(&self, size: Vec2, frame: Rect) -> Rect {
         // TODO(emilk): allow this alignment to be customized
         Align2::LEFT_CENTER.align_size_within_rect(size, frame)
     }
 
-    pub(crate) fn justify_and_align(&self, frame: Rect, size: Vec2) -> Rect {
+    pub fn justify_and_align(&self, frame: Rect, size: Vec2) -> Rect {
         self.align_size_within_rect(size, frame)
     }
 
-    pub(crate) fn advance(&mut self, cursor: &mut Rect, _frame_rect: Rect, widget_rect: Rect) {
+    pub fn advance(&mut self, cursor: &mut Rect, _frame_rect: Rect, widget_rect: Rect) {
         let debug_expand_width = self.style.debug.show_expand_width;
         let debug_expand_height = self.style.debug.show_expand_height;
         if debug_expand_width || debug_expand_height {
@@ -200,7 +200,7 @@ impl GridLayout {
         self.col += 1;
     }
 
-    pub(crate) fn end_row(&mut self, cursor: &mut Rect, painter: &Painter) {
+    pub fn end_row(&mut self, cursor: &mut Rect, painter: &Painter) {
         cursor.min.x = self.initial_available.min.x;
         cursor.min.y += self.spacing.y;
         cursor.min.y += self
@@ -224,7 +224,7 @@ impl GridLayout {
         }
     }
 
-    pub(crate) fn save(&self) {
+    pub fn save(&self) {
         if self.curr_state != self.prev_state {
             self.curr_state.clone().store(&self.ctx, self.id);
             self.ctx.request_repaint();

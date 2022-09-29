@@ -2,15 +2,15 @@
 //!
 //! For instance, a [`Frame`] adds a frame and background to some contained UI.
 
-pub(crate) mod area;
+pub mod area;
 pub mod collapsing_header;
 mod combo_box;
-pub(crate) mod frame;
+pub mod frame;
 pub mod panel;
 pub mod popup;
-pub(crate) mod resize;
-pub(crate) mod scroll_area;
-pub(crate) mod window;
+pub mod resize;
+pub mod scroll_area;
+pub mod window;
 
 pub use {
     area::Area,

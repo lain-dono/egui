@@ -25,7 +25,7 @@ use std::sync::Arc;
 
 /// What is saved between frames.
 #[derive(Clone, Default)]
-pub(crate) struct BarState {
+pub struct BarState {
     open_menu: MenuRootManager,
 }
 
@@ -105,7 +105,7 @@ pub fn menu_button<R>(
 /// Opens on hover.
 ///
 /// Returns `None` if the menu is not open.
-pub(crate) fn submenu_button<R>(
+pub fn submenu_button<R>(
     ui: &mut Ui,
     parent_state: Arc<RwLock<MenuState>>,
     title: impl Into<WidgetText>,
@@ -115,7 +115,7 @@ pub(crate) fn submenu_button<R>(
 }
 
 /// wrapper for the contents of every menu.
-pub(crate) fn menu_ui<'c, R>(
+pub fn menu_ui<'c, R>(
     ctx: &Context,
     menu_id: impl std::hash::Hash,
     menu_state_arc: &Arc<RwLock<MenuState>>,
@@ -178,7 +178,7 @@ fn stationary_menu_impl<'c, R>(
 }
 
 /// Response to secondary clicks (right-clicks) by showing the given menu.
-pub(crate) fn context_menu(
+pub fn context_menu(
     response: &Response,
     add_contents: impl FnOnce(&mut Ui),
 ) -> Option<InnerResponse<()>> {
@@ -194,7 +194,7 @@ pub(crate) fn context_menu(
 
 /// Stores the state for the context menu.
 #[derive(Clone, Default)]
-pub(crate) struct MenuRootManager {
+pub struct MenuRootManager {
     inner: Option<MenuRoot>,
 }
 
@@ -238,7 +238,7 @@ impl std::ops::DerefMut for MenuRootManager {
 
 /// Menu root associated with an Id from a Response
 #[derive(Clone)]
-pub(crate) struct MenuRoot {
+pub struct MenuRoot {
     pub menu_state: Arc<RwLock<MenuState>>,
     pub id: Id,
 }
@@ -360,7 +360,7 @@ impl MenuRoot {
 }
 
 #[derive(Copy, Clone, PartialEq)]
-pub(crate) enum MenuResponse {
+pub enum MenuResponse {
     Close,
     Stay,
     Create(Pos2, Id),
@@ -406,7 +406,7 @@ impl SubMenuButton {
         self
     }
 
-    pub(crate) fn show(self, ui: &mut Ui, menu_state: &MenuState, sub_id: Id) -> Response {
+    pub fn show(self, ui: &mut Ui, menu_state: &MenuState, sub_id: Id) -> Response {
         let SubMenuButton { text, icon, .. } = self;
 
         let text_style = TextStyle::Button;
@@ -488,7 +488,7 @@ impl SubMenu {
     }
 }
 
-pub(crate) struct MenuState {
+pub struct MenuState {
     /// The opened sub-menu and its [`Id`]
     sub_menu: Option<(Id, Arc<RwLock<MenuState>>)>,
 

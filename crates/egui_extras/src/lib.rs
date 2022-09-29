@@ -22,7 +22,7 @@ mod table;
 pub use crate::datepicker::DatePickerButton;
 
 pub use crate::image::RetainedImage;
-pub(crate) use crate::layout::StripLayout;
+pub use crate::layout::StripLayout;
 pub use crate::sizing::Size;
 pub use crate::strip::*;
 pub use crate::table::*;

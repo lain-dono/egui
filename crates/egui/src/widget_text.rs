@@ -518,7 +518,7 @@ impl WidgetText {
         }
     }
 
-    pub(crate) fn font_height(&self, fonts: &epaint::Fonts, style: &Style) -> f32 {
+    pub fn font_height(&self, fonts: &epaint::Fonts, style: &Style) -> f32 {
         match self {
             Self::RichText(text) => text.font_height(fonts, style),
             Self::LayoutJob(job) => job.font_height(fonts),

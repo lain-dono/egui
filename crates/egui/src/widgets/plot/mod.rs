@@ -119,9 +119,9 @@ impl PlotMemory {
 /// the user between frames.
 #[derive(Clone, PartialEq)]
 pub struct LinkedAxisGroup {
-    pub(crate) link_x: bool,
-    pub(crate) link_y: bool,
-    pub(crate) bounds: Rc<Cell<Option<PlotBounds>>>,
+    pub link_x: bool,
+    pub link_y: bool,
+    pub bounds: Rc<Cell<Option<PlotBounds>>>,
 }
 
 impl LinkedAxisGroup {

@@ -1,7 +1,7 @@
 use egui::{Pos2, Rect, Response, Sense, Ui};
 
 #[derive(Clone, Copy)]
-pub(crate) enum CellSize {
+pub enum CellSize {
     /// Absolute size in points
     Absolute(f32),
 
@@ -18,7 +18,7 @@ pub(crate) enum CellSize {
 ///
 /// In a table there's a [`StripLayout`] for each table row with a horizontal [`CellDirection`].
 /// Its cells go from left to right. And the lines go from top to bottom.
-pub(crate) enum CellDirection {
+pub enum CellDirection {
     /// Cells go from left to right.
     Horizontal,
 
@@ -28,17 +28,17 @@ pub(crate) enum CellDirection {
 
 /// Positions cells in [`CellDirection`] and starts a new line on [`StripLayout::end_line`]
 pub struct StripLayout<'l> {
-    pub(crate) ui: &'l mut Ui,
+    pub ui: &'l mut Ui,
     direction: CellDirection,
-    pub(crate) rect: Rect,
+    pub rect: Rect,
     cursor: Pos2,
     max: Pos2,
-    pub(crate) clip: bool,
+    pub clip: bool,
     cell_layout: egui::Layout,
 }
 
 impl<'l> StripLayout<'l> {
-    pub(crate) fn new(
+    pub fn new(
         ui: &'l mut Ui,
         direction: CellDirection,
         clip: bool,
@@ -88,11 +88,11 @@ impl<'l> StripLayout<'l> {
         }
     }
 
-    pub(crate) fn empty(&mut self, width: CellSize, height: CellSize) {
+    pub fn empty(&mut self, width: CellSize, height: CellSize) {
         self.set_pos(self.cell_rect(&width, &height));
     }
 
-    pub(crate) fn add(
+    pub fn add(
         &mut self,
         width: CellSize,
         height: CellSize,
@@ -104,7 +104,7 @@ impl<'l> StripLayout<'l> {
         self.ui.allocate_rect(rect.union(used_rect), Sense::hover())
     }
 
-    pub(crate) fn add_striped(
+    pub fn add_striped(
         &mut self,
         width: CellSize,
         height: CellSize,
@@ -137,7 +137,7 @@ impl<'l> StripLayout<'l> {
     }
 
     /// Skip a lot of space.
-    pub(crate) fn skip_space(&mut self, delta: egui::Vec2) {
+    pub fn skip_space(&mut self, delta: egui::Vec2) {
         let before = self.cursor;
         self.cursor += delta;
         let rect = Rect::from_two_pos(before, self.cursor);

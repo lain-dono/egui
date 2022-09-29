@@ -20,7 +20,7 @@ impl TypeId {
     }
 
     #[inline(always)]
-    pub(crate) fn value(&self) -> u64 {
+    pub fn value(&self) -> u64 {
         self.0
     }
 }
@@ -131,7 +131,7 @@ impl std::fmt::Debug for Element {
 impl Element {
     /// Create a value that won't be persisted.
     #[inline]
-    pub(crate) fn new_temp<T: 'static + Any + Clone + Send + Sync>(t: T) -> Self {
+    pub fn new_temp<T: 'static + Any + Clone + Send + Sync>(t: T) -> Self {
         Self::Value {
             value: Box::new(t),
             clone_fn: |x| {
@@ -145,7 +145,7 @@ impl Element {
 
     /// Create a value that will be persisted.
     #[inline]
-    pub(crate) fn new_persisted<T: SerializableAny>(t: T) -> Self {
+    pub fn new_persisted<T: SerializableAny>(t: T) -> Self {
         Self::Value {
             value: Box::new(t),
             clone_fn: |x| {
@@ -162,7 +162,7 @@ impl Element {
 
     /// The type of the stored value.
     #[inline]
-    pub(crate) fn type_id(&self) -> TypeId {
+    pub fn type_id(&self) -> TypeId {
         match self {
             Self::Value { value, .. } => (**value).type_id().into(),
             Self::Serialized { type_id, .. } => *type_id,
@@ -170,7 +170,7 @@ impl Element {
     }
 
     #[inline]
-    pub(crate) fn get_mut_temp<T: 'static>(&mut self) -> Option<&mut T> {
+    pub fn get_mut_temp<T: 'static>(&mut self) -> Option<&mut T> {
         match self {
             Self::Value { value, .. } => value.downcast_mut(),
             Self::Serialized { .. } => None,
@@ -178,7 +178,7 @@ impl Element {
     }
 
     #[inline]
-    pub(crate) fn get_temp_mut_or_insert_with<T: 'static + Any + Clone + Send + Sync>(
+    pub fn get_temp_mut_or_insert_with<T: 'static + Any + Clone + Send + Sync>(
         &mut self,
         insert_with: impl FnOnce() -> T,
     ) -> &mut T {
@@ -200,7 +200,7 @@ impl Element {
     }
 
     #[inline]
-    pub(crate) fn get_persisted_mut_or_insert_with<T: SerializableAny>(
+    pub fn get_persisted_mut_or_insert_with<T: SerializableAny>(
         &mut self,
         insert_with: impl FnOnce() -> T,
     ) -> &mut T {
@@ -228,7 +228,7 @@ impl Element {
         }
     }
 
-    pub(crate) fn get_mut_persisted<T: SerializableAny>(&mut self) -> Option<&mut T> {
+    pub fn get_mut_persisted<T: SerializableAny>(&mut self) -> Option<&mut T> {
         match self {
             Self::Value { value, .. } => value.downcast_mut(),
 

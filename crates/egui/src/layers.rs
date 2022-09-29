@@ -157,7 +157,7 @@ impl PaintList {
 }
 
 #[derive(Clone, Default)]
-pub(crate) struct GraphicLayers([IdMap<PaintList>; Order::COUNT]);
+pub struct GraphicLayers([IdMap<PaintList>; Order::COUNT]);
 
 impl GraphicLayers {
     pub fn list(&mut self, layer_id: LayerId) -> &mut PaintList {

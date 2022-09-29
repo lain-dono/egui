@@ -8,7 +8,7 @@ use crate::*;
 
 /// Same state for all [`DragValue`]s.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct MonoState {
+pub struct MonoState {
     last_dragged_id: Option<Id>,
     last_dragged_value: Option<f64>,
     /// For temporary edit of a [`DragValue`] value.
@@ -17,7 +17,7 @@ pub(crate) struct MonoState {
 }
 
 impl MonoState {
-    pub(crate) fn end_frame(&mut self, input: &InputState) {
+    pub fn end_frame(&mut self, input: &InputState) {
         if input.pointer.any_pressed() || input.pointer.any_released() {
             self.last_dragged_id = None;
             self.last_dragged_value = None;

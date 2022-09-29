@@ -424,16 +424,16 @@ pub struct IconData {
 /// allocate textures, and change settings (e.g. window size).
 pub struct Frame {
     /// Information about the integration.
-    pub(crate) info: IntegrationInfo,
+    pub info: IntegrationInfo,
 
     /// Where the app can issue commands back to the integration.
-    pub(crate) output: backend::AppOutput,
+    pub output: backend::AppOutput,
 
     /// A place where you can store custom data in a way that persists when you restart the app.
-    pub(crate) storage: Option<Box<dyn Storage>>,
+    pub storage: Option<Box<dyn Storage>>,
 
     /// Can be used to manage GPU resources for custom rendering with WGPU using [`egui::PaintCallback`]s.
-    pub(crate) wgpu_render_state: Option<egui_wgpu::RenderState>,
+    pub wgpu_render_state: Option<egui_wgpu::RenderState>,
 }
 
 impl Frame {
@@ -537,7 +537,7 @@ impl Frame {
     }
 
     /// for integrations only: call once per frame
-    pub(crate) fn take_app_output(&mut self) -> backend::AppOutput {
+    pub fn take_app_output(&mut self) -> backend::AppOutput {
         std::mem::take(&mut self.output)
     }
 }
@@ -668,7 +668,7 @@ pub trait Storage {
 
 /// Stores nothing.
 #[derive(Clone, Default)]
-pub(crate) struct DummyStorage {}
+pub struct DummyStorage {}
 
 impl Storage for DummyStorage {
     fn get_string(&self, _key: &str) -> Option<String> {
@@ -703,7 +703,7 @@ pub const APP_KEY: &str = "app";
 // ----------------------------------------------------------------------------
 
 /// You only need to look here if you are writing a backend for `epi`.
-pub(crate) mod backend {
+pub mod backend {
     /// Action that can be taken by the user app.
     #[derive(Clone, Debug, Default)]
     #[must_use]

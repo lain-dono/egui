@@ -10,7 +10,7 @@ use crate::*;
 // TODO(emilk): this is not currently stored in `memory().data`, but maybe it should be?
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-pub(crate) struct State {
+pub struct State {
     /// Last known pos
     pub pos: Pos2,
 
@@ -44,7 +44,7 @@ impl State {
 #[must_use = "You should call .show()"]
 #[derive(Clone, Copy, Debug)]
 pub struct Area {
-    pub(crate) id: Id,
+    pub id: Id,
     movable: bool,
     interactable: bool,
     enabled: bool,
@@ -157,7 +157,7 @@ impl Area {
         self
     }
 
-    pub(crate) fn get_pivot(&self) -> Align2 {
+    pub fn get_pivot(&self) -> Align2 {
         if let Some((pivot, _)) = self.anchor {
             pivot
         } else {
@@ -166,10 +166,10 @@ impl Area {
     }
 }
 
-pub(crate) struct Prepared {
+pub struct Prepared {
     layer_id: LayerId,
     state: State,
-    pub(crate) movable: bool,
+    pub movable: bool,
     enabled: bool,
     drag_bounds: Option<Rect>,
     /// Set the first frame of new windows with anchors.
@@ -193,7 +193,7 @@ impl Area {
         InnerResponse { inner, response }
     }
 
-    pub(crate) fn begin(self, ctx: &Context) -> Prepared {
+    pub fn begin(self, ctx: &Context) -> Prepared {
         let Area {
             id,
             movable,
@@ -273,19 +273,19 @@ impl Area {
 }
 
 impl Prepared {
-    pub(crate) fn state(&self) -> &State {
+    pub fn state(&self) -> &State {
         &self.state
     }
 
-    pub(crate) fn state_mut(&mut self) -> &mut State {
+    pub fn state_mut(&mut self) -> &mut State {
         &mut self.state
     }
 
-    pub(crate) fn drag_bounds(&self) -> Option<Rect> {
+    pub fn drag_bounds(&self) -> Option<Rect> {
         self.drag_bounds
     }
 
-    pub(crate) fn content_ui(&self, ctx: &Context) -> Ui {
+    pub fn content_ui(&self, ctx: &Context) -> Ui {
         let screen_rect = ctx.input().screen_rect();
 
         let bounds = if let Some(bounds) = self.drag_bounds {
@@ -326,7 +326,7 @@ impl Prepared {
     }
 
     #[allow(clippy::needless_pass_by_value)] // intentional to swallow up `content_ui`.
-    pub(crate) fn end(self, ctx: &Context, content_ui: Ui) -> Response {
+    pub fn end(self, ctx: &Context, content_ui: Ui) -> Response {
         let Prepared {
             layer_id,
             mut state,

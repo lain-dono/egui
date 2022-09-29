@@ -6,7 +6,7 @@ use std::f32::INFINITY;
 /// This describes the bounds and existing contents of an [`Ui`][`crate::Ui`].
 /// It is what is used and updated by [`Layout`] when adding new widgets.
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct Region {
+pub struct Region {
     /// This is the minimal size of the [`Ui`](crate::Ui).
     /// When adding new widgets, this will generally expand.
     ///
@@ -39,7 +39,7 @@ pub(crate) struct Region {
     ///
     /// If something has already been added, this will point to `style.spacing.item_spacing` beyond the latest child.
     /// The cursor can thus be `style.spacing.item_spacing` pixels outside of the min_rect.
-    pub(crate) cursor: Rect,
+    pub cursor: Rect,
 }
 
 impl Region {
@@ -413,7 +413,7 @@ impl Layout {
         cursor
     }
 
-    pub(crate) fn region_from_max_rect(&self, max_rect: Rect) -> Region {
+    pub fn region_from_max_rect(&self, max_rect: Rect) -> Region {
         egui_assert!(!max_rect.any_nan());
         egui_assert!(max_rect.is_finite());
         let mut region = Region {
@@ -426,13 +426,13 @@ impl Layout {
         region
     }
 
-    pub(crate) fn available_rect_before_wrap(&self, region: &Region) -> Rect {
+    pub fn available_rect_before_wrap(&self, region: &Region) -> Rect {
         self.available_from_cursor_max_rect(region.cursor, region.max_rect)
     }
 
     /// Amount of space available for a widget.
     /// For wrapping layouts, this is the maximum (after wrap).
-    pub(crate) fn available_size(&self, r: &Region) -> Vec2 {
+    pub fn available_size(&self, r: &Region) -> Vec2 {
         if self.main_wrap {
             if self.main_dir.is_horizontal() {
                 vec2(r.max_rect.width(), r.cursor.height())
@@ -513,7 +513,7 @@ impl Layout {
     /// The returned `frame_rect` [`Rect`] will always be justified along the cross axis.
     /// This is what you then pass to `advance_after_rects`.
     /// Use `justify_and_align` to get the inner `widget_rect`.
-    pub(crate) fn next_frame(&self, region: &Region, child_size: Vec2, spacing: Vec2) -> Rect {
+    pub fn next_frame(&self, region: &Region, child_size: Vec2, spacing: Vec2) -> Rect {
         region.sanity_check();
         egui_assert!(child_size.x >= 0.0 && child_size.y >= 0.0);
 
@@ -635,7 +635,7 @@ impl Layout {
     }
 
     /// Apply justify (fill width/height) and/or alignment after calling `next_space`.
-    pub(crate) fn justify_and_align(&self, frame: Rect, mut child_size: Vec2) -> Rect {
+    pub fn justify_and_align(&self, frame: Rect, mut child_size: Vec2) -> Rect {
         egui_assert!(child_size.x >= 0.0 && child_size.y >= 0.0);
         egui_assert!(!frame.is_negative());
 
@@ -648,11 +648,7 @@ impl Layout {
         self.align_size_within_rect(child_size, frame)
     }
 
-    pub(crate) fn next_widget_space_ignore_wrap_justify(
-        &self,
-        region: &Region,
-        size: Vec2,
-    ) -> Rect {
+    pub fn next_widget_space_ignore_wrap_justify(&self, region: &Region, size: Vec2) -> Rect {
         let frame = self.next_frame_ignore_wrap(region, size);
         let rect = self.align_size_within_rect(size, frame);
         egui_assert!(!rect.any_nan());
@@ -663,13 +659,13 @@ impl Layout {
     }
 
     /// Where would the next tiny widget be centered?
-    pub(crate) fn next_widget_position(&self, region: &Region) -> Pos2 {
+    pub fn next_widget_position(&self, region: &Region) -> Pos2 {
         self.next_widget_space_ignore_wrap_justify(region, Vec2::ZERO)
             .center()
     }
 
     /// Advance the cursor by this many points, and allocate in region.
-    pub(crate) fn advance_cursor(&self, region: &mut Region, amount: f32) {
+    pub fn advance_cursor(&self, region: &mut Region, amount: f32) {
         match self.main_dir {
             Direction::LeftToRight => {
                 region.cursor.min.x += amount;
@@ -694,7 +690,7 @@ impl Layout {
     ///
     /// * `frame_rect`: the frame inside which a widget was e.g. centered
     /// * `widget_rect`: the actual rect used by the widget
-    pub(crate) fn advance_after_rects(
+    pub fn advance_after_rects(
         &self,
         cursor: &mut Rect,
         frame_rect: Rect,
@@ -764,7 +760,7 @@ impl Layout {
 
     /// Move to the next row in a wrapping layout.
     /// Otherwise does nothing.
-    pub(crate) fn end_row(&mut self, region: &mut Region, spacing: Vec2) {
+    pub fn end_row(&mut self, region: &mut Region, spacing: Vec2) {
         if self.main_wrap {
             match self.main_dir {
                 Direction::LeftToRight => {
@@ -787,7 +783,7 @@ impl Layout {
     }
 
     /// Set row height in horizontal wrapping layout.
-    pub(crate) fn set_row_height(&mut self, region: &mut Region, height: f32) {
+    pub fn set_row_height(&mut self, region: &mut Region, height: f32) {
         if self.main_wrap && self.is_horizontal() {
             region.cursor.max.y = region.cursor.min.y + height;
         }
@@ -799,7 +795,7 @@ impl Layout {
 /// ## Debug stuff
 impl Layout {
     /// Shows where the next widget is going to be placed
-    pub(crate) fn paint_text_at_cursor(
+    pub fn paint_text_at_cursor(
         &self,
         painter: &crate::Painter,
         region: &Region,

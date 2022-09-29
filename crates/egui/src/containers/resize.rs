@@ -2,18 +2,18 @@ use crate::*;
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-pub(crate) struct State {
+pub struct State {
     /// This is the size that the user has picked by dragging the resize handles.
     /// This may be smaller and/or larger than the actual size.
     /// For instance, the user may have tried to shrink too much (not fitting the contents).
     /// Or the user requested a large area, but the content don't need that much space.
-    pub(crate) desired_size: Vec2,
+    pub desired_size: Vec2,
 
     /// Actual size of content last frame
     last_content_size: Vec2,
 
     /// Externally requested size (e.g. by Window) for the next frame
-    pub(crate) requested_size: Option<Vec2>,
+    pub requested_size: Option<Vec2>,
 }
 
 impl State {
@@ -36,8 +36,8 @@ pub struct Resize {
     /// If false, we are no enabled
     resizable: bool,
 
-    pub(crate) min_size: Vec2,
-    pub(crate) max_size: Vec2,
+    pub min_size: Vec2,
+    pub max_size: Vec2,
 
     default_size: Vec2,
 

@@ -5,7 +5,7 @@ use epaint::Shape;
 
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
-pub(crate) struct InnerState {
+pub struct InnerState {
     open: bool,
 
     /// Height of the region when open. Used for animations
@@ -72,11 +72,7 @@ impl CollapsingState {
     }
 
     /// Will toggle when clicked, etc.
-    pub(crate) fn show_default_button_with_size(
-        &mut self,
-        ui: &mut Ui,
-        button_size: Vec2,
-    ) -> Response {
+    pub fn show_default_button_with_size(&mut self, ui: &mut Ui, button_size: Vec2) -> Response {
         let (_id, rect) = ui.allocate_space(button_size);
         let response = ui.interact(rect, self.id, Sense::click());
         if response.clicked() {

@@ -73,16 +73,16 @@ impl Painter {
     }
 
     /// If set, colors will be modified to look like this
-    pub(crate) fn set_fade_to_color(&mut self, fade_to_color: Option<Color32>) {
+    pub fn set_fade_to_color(&mut self, fade_to_color: Option<Color32>) {
         self.fade_to_color = fade_to_color;
     }
 
-    pub(crate) fn is_visible(&self) -> bool {
+    pub fn is_visible(&self) -> bool {
         self.fade_to_color != Some(Color32::TRANSPARENT)
     }
 
     /// If `false`, nothing added to the painter will be visible
-    pub(crate) fn set_invisible(&mut self) {
+    pub fn set_invisible(&mut self) {
         self.fade_to_color = Some(Color32::TRANSPARENT);
     }
 

@@ -3,7 +3,7 @@ use std::ops::RangeInclusive;
 use crate::*;
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) struct TooltipRect {
+pub struct TooltipRect {
     pub id: Id,
     pub rect: Rect,
     pub count: usize,
@@ -12,35 +12,35 @@ pub(crate) struct TooltipRect {
 /// State that is collected during a frame and then cleared.
 /// Short-term (single frame) memory.
 #[derive(Clone)]
-pub(crate) struct FrameState {
+pub struct FrameState {
     /// All [`Id`]s that were used this frame.
     /// Used to debug [`Id`] clashes of widgets.
-    pub(crate) used_ids: IdMap<Rect>,
+    pub used_ids: IdMap<Rect>,
 
     /// Starts off as the screen_rect, shrinks as panels are added.
     /// The [`CentralPanel`] does not change this.
     /// This is the area available to Window's.
-    pub(crate) available_rect: Rect,
+    pub available_rect: Rect,
 
     /// Starts off as the screen_rect, shrinks as panels are added.
     /// The [`CentralPanel`] retracts from this.
-    pub(crate) unused_rect: Rect,
+    pub unused_rect: Rect,
 
     /// How much space is used by panels.
-    pub(crate) used_by_panels: Rect,
+    pub used_by_panels: Rect,
 
     /// If a tooltip has been shown this frame, where was it?
     /// This is used to prevent multiple tooltips to cover each other.
     /// Initialized to `None` at the start of each frame.
-    pub(crate) tooltip_rect: Option<TooltipRect>,
+    pub tooltip_rect: Option<TooltipRect>,
 
     /// Set to [`InputState::scroll_delta`] on the start of each frame.
     ///
     /// Cleared by the first [`ScrollArea`] that makes use of it.
-    pub(crate) scroll_delta: Vec2, // TODO(emilk): move to `InputState` ?
+    pub scroll_delta: Vec2, // TODO(emilk): move to `InputState` ?
 
     /// horizontal, vertical
-    pub(crate) scroll_target: [Option<(RangeInclusive<f32>, Option<Align>)>; 2],
+    pub scroll_target: [Option<(RangeInclusive<f32>, Option<Align>)>; 2],
 }
 
 impl Default for FrameState {
@@ -58,7 +58,7 @@ impl Default for FrameState {
 }
 
 impl FrameState {
-    pub(crate) fn begin_frame(&mut self, input: &InputState) {
+    pub fn begin_frame(&mut self, input: &InputState) {
         let Self {
             used_ids,
             available_rect,
@@ -81,7 +81,7 @@ impl FrameState {
     /// How much space is still available after panels has been added.
     /// This is the "background" area, what egui doesn't cover with panels (but may cover with windows).
     /// This is also the area to which windows are constrained.
-    pub(crate) fn available_rect(&self) -> Rect {
+    pub fn available_rect(&self) -> Rect {
         crate::egui_assert!(
             self.available_rect.is_finite(),
             "Called `available_rect()` before `Context::run()`"
@@ -90,7 +90,7 @@ impl FrameState {
     }
 
     /// Shrink `available_rect`.
-    pub(crate) fn allocate_left_panel(&mut self, panel_rect: Rect) {
+    pub fn allocate_left_panel(&mut self, panel_rect: Rect) {
         crate::egui_assert!(
             panel_rect.min.distance(self.available_rect.min) < 0.1,
             "Mismatching left panel. You must not create a panel from within another panel."
@@ -101,7 +101,7 @@ impl FrameState {
     }
 
     /// Shrink `available_rect`.
-    pub(crate) fn allocate_right_panel(&mut self, panel_rect: Rect) {
+    pub fn allocate_right_panel(&mut self, panel_rect: Rect) {
         crate::egui_assert!(
             panel_rect.max.distance(self.available_rect.max) < 0.1,
             "Mismatching right panel. You must not create a panel from within another panel."
@@ -112,7 +112,7 @@ impl FrameState {
     }
 
     /// Shrink `available_rect`.
-    pub(crate) fn allocate_top_panel(&mut self, panel_rect: Rect) {
+    pub fn allocate_top_panel(&mut self, panel_rect: Rect) {
         crate::egui_assert!(
             panel_rect.min.distance(self.available_rect.min) < 0.1,
             "Mismatching top panel. You must not create a panel from within another panel."
@@ -123,7 +123,7 @@ impl FrameState {
     }
 
     /// Shrink `available_rect`.
-    pub(crate) fn allocate_bottom_panel(&mut self, panel_rect: Rect) {
+    pub fn allocate_bottom_panel(&mut self, panel_rect: Rect) {
         crate::egui_assert!(
             panel_rect.max.distance(self.available_rect.max) < 0.1,
             "Mismatching bottom panel. You must not create a panel from within another panel."
@@ -133,7 +133,7 @@ impl FrameState {
         self.used_by_panels = self.used_by_panels.union(panel_rect);
     }
 
-    pub(crate) fn allocate_central_panel(&mut self, panel_rect: Rect) {
+    pub fn allocate_central_panel(&mut self, panel_rect: Rect) {
         // Note: we do not shrink `available_rect`, because
         // we allow windows to cover the CentralPanel.
         self.unused_rect = Rect::NOTHING; // Nothing left unused after this

@@ -62,22 +62,22 @@ pub struct Memory {
     // ------------------------------------------
     /// new scale that will be applied at the start of the next frame
     #[cfg_attr(feature = "persistence", serde(skip))]
-    pub(crate) new_pixels_per_point: Option<f32>,
+    pub new_pixels_per_point: Option<f32>,
 
     /// new fonts that will be applied at the start of the next frame
     #[cfg_attr(feature = "persistence", serde(skip))]
-    pub(crate) new_font_definitions: Option<epaint::text::FontDefinitions>,
+    pub new_font_definitions: Option<epaint::text::FontDefinitions>,
 
     #[cfg_attr(feature = "persistence", serde(skip))]
-    pub(crate) interaction: Interaction,
+    pub interaction: Interaction,
 
     #[cfg_attr(feature = "persistence", serde(skip))]
-    pub(crate) window_interaction: Option<window::WindowInteraction>,
+    pub window_interaction: Option<window::WindowInteraction>,
 
     #[cfg_attr(feature = "persistence", serde(skip))]
-    pub(crate) drag_value: crate::widgets::drag_value::MonoState,
+    pub drag_value: crate::widgets::drag_value::MonoState,
 
-    pub(crate) areas: Areas,
+    pub areas: Areas,
 
     /// Which popup-window is open (if any)?
     /// Could be a combo box, color picker, menu etc.
@@ -97,7 +97,7 @@ pub struct Memory {
 pub struct Options {
     /// The default style for new [`Ui`](crate::Ui):s.
     #[cfg_attr(feature = "serde", serde(skip))]
-    pub(crate) style: std::sync::Arc<Style>,
+    pub style: std::sync::Arc<Style>,
 
     /// Controls the tessellator.
     pub tessellation_options: epaint::TessellationOptions,
@@ -137,7 +137,7 @@ impl Default for Options {
 /// If the user releases the button without moving the mouse we register it as a click on `click_id`.
 /// If the cursor moves too much we clear the `click_id` and start passing move events to `drag_id`.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct Interaction {
+pub struct Interaction {
     /// A widget interested in clicks that has a mouse press on it.
     pub click_id: Option<Id>,
 
@@ -164,7 +164,7 @@ pub(crate) struct Interaction {
 
 /// Keeps tracks of what widget has keyboard focus
 #[derive(Clone, Debug, Default)]
-pub(crate) struct Focus {
+pub struct Focus {
     /// The widget with keyboard focus (i.e. a text input field).
     id: Option<Id>,
 
@@ -264,7 +264,7 @@ impl Focus {
         }
     }
 
-    pub(crate) fn end_frame(&mut self, used_ids: &IdMap<Rect>) {
+    pub fn end_frame(&mut self, used_ids: &IdMap<Rect>) {
         if let Some(id) = self.id {
             // Allow calling `request_focus` one frame and not using it until next frame
             let recently_gained_focus = self.id_previous_frame != Some(id);
@@ -276,7 +276,7 @@ impl Focus {
         }
     }
 
-    pub(crate) fn had_focus_last_frame(&self, id: Id) -> bool {
+    pub fn had_focus_last_frame(&self, id: Id) -> bool {
         self.id_previous_frame == Some(id)
     }
 
@@ -304,7 +304,7 @@ impl Focus {
 }
 
 impl Memory {
-    pub(crate) fn begin_frame(
+    pub fn begin_frame(
         &mut self,
         prev_input: &crate::input_state::InputState,
         new_input: &crate::data::input::RawInput,
@@ -316,7 +316,7 @@ impl Memory {
         }
     }
 
-    pub(crate) fn end_frame(&mut self, input: &InputState, used_ids: &IdMap<Rect>) {
+    pub fn end_frame(&mut self, input: &InputState, used_ids: &IdMap<Rect>) {
         self.caches.update();
         self.areas.end_frame();
         self.interaction.focus.end_frame(used_ids);
@@ -333,17 +333,17 @@ impl Memory {
         self.areas.order().iter().copied()
     }
 
-    pub(crate) fn had_focus_last_frame(&self, id: Id) -> bool {
+    pub fn had_focus_last_frame(&self, id: Id) -> bool {
         self.interaction.focus.id_previous_frame == Some(id)
     }
 
     /// True if the given widget had keyboard focus last frame, but not this one.
-    pub(crate) fn lost_focus(&self, id: Id) -> bool {
+    pub fn lost_focus(&self, id: Id) -> bool {
         self.had_focus_last_frame(id) && !self.has_focus(id)
     }
 
     /// True if the given widget has keyboard focus this frame, but didn't last frame.
-    pub(crate) fn gained_focus(&self, id: Id) -> bool {
+    pub fn gained_focus(&self, id: Id) -> bool {
         !self.had_focus_last_frame(id) && self.has_focus(id)
     }
 
@@ -401,7 +401,7 @@ impl Memory {
     /// Register this widget as being interested in getting keyboard focus.
     /// This will allow the user to select it with tab and shift-tab.
     #[inline(always)]
-    pub(crate) fn interested_in_focus(&mut self, id: Id) {
+    pub fn interested_in_focus(&mut self, id: Id) {
         self.interaction.focus.interested_in_focus(id);
     }
 
@@ -500,20 +500,20 @@ pub struct Areas {
 }
 
 impl Areas {
-    pub(crate) fn count(&self) -> usize {
+    pub fn count(&self) -> usize {
         self.areas.len()
     }
 
-    pub(crate) fn get(&self, id: Id) -> Option<&area::State> {
+    pub fn get(&self, id: Id) -> Option<&area::State> {
         self.areas.get(&id)
     }
 
     /// Back-to-front. Top is last.
-    pub(crate) fn order(&self) -> &[LayerId] {
+    pub fn order(&self) -> &[LayerId] {
         &self.order
     }
 
-    pub(crate) fn set_state(&mut self, layer_id: LayerId, state: area::State) {
+    pub fn set_state(&mut self, layer_id: LayerId, state: area::State) {
         self.visible_current_frame.insert(layer_id);
         self.areas.insert(layer_id.id, state);
         if !self.order.iter().any(|x| *x == layer_id) {
@@ -556,7 +556,7 @@ impl Areas {
             .collect()
     }
 
-    pub(crate) fn visible_windows(&self) -> Vec<&area::State> {
+    pub fn visible_windows(&self) -> Vec<&area::State> {
         self.visible_layer_ids()
             .iter()
             .filter(|layer| layer.order == crate::Order::Middle)
@@ -573,7 +573,7 @@ impl Areas {
         }
     }
 
-    pub(crate) fn end_frame(&mut self) {
+    pub fn end_frame(&mut self) {
         let Self {
             visible_last_frame,
             visible_current_frame,
